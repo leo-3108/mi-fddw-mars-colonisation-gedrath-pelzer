@@ -2,7 +2,7 @@
 
 Project im Rahmen von
 
-**Frameworks, Dienste und Daten im Web (FDDW)** \
+**Frameworks, Dienste und Daten im Web (FDDW) – Prof. Dr. Kristian Fischer** \
 Kurs im Schwerpunktmodul Web-Development \
 Medieninformatik Ba. \
 Sommersemester 2020
