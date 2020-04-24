@@ -6,6 +6,6 @@ Fixes Issue #
 - 
 
 ## Dinge die jetzt zu beachten sind
--
+- Neues NPM-Modul etc.
 -
 -
