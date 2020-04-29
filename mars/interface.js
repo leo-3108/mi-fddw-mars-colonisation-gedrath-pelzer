@@ -1,0 +1,1 @@
+//Mars-Interface, welches die Verbindung zur Erde herstellt und alle Daten empfängt
