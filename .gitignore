@@ -173,3 +173,7 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.gitignore.io/api/node,macos,windows,visualstudiocode
+
+# config-data
+config.earth.json
+config.mars.json
