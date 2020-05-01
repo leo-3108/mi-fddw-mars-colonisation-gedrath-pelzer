@@ -177,3 +177,4 @@ $RECYCLE.BIN/
 # config-data
 config.earth.json
 config.mars.json
+package-lock.json
