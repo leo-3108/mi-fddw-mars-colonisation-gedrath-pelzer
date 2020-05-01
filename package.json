@@ -4,7 +4,8 @@
     "description": "2. Meilenstein, FDDW SoSe2020",
     "main": "index.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "sensors": "node mars/sensors/rooms/labor/temperature.1.js & node mars/sensors/rooms/labor/temperature.2.js & node mars/sensors/rooms/labor/temperature.3.js"
     },
     "author": "",
     "license": "ISC",
