@@ -53,7 +53,7 @@ amqp.connect(config.amqp.url, function (error0, connection) {
     });
 
 
-    function senddata(key, content, channel, exchange2) {
+    function senddata(key, content, channel, exchange) {
         //Code zum weiterleiten
         channel.publish(exchange, key, Buffer.from(content));
     }
