@@ -27,6 +27,7 @@ amqp.connect(config.amqp.url, function (error0, connection) {
             channel.bindQueue(q.queue, exchange, '#');
 
             channel.consume(q.queue, function (msg) {
+                console.log(" [x] Get data");
                 //Anwendungslogik
             }, {
                 noAck: true
