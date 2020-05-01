@@ -34,7 +34,6 @@ function senddata() {
 
             setInterval(() => {
                 async function getdata() {
-                    console.log('')
                     let data = await getTemperature()
                     channel.publish(exchange, sensorroom + '.' + sensortype + '.' + sensorid, Buffer.from(data.toExponential));
                     console.log(" [sensor] " + sensorroom + '.' + sensortype + '.' + sensorid + " sent data: " + data);
