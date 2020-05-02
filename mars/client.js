@@ -11,7 +11,7 @@ amqp.connect(config.amqp.url, function (error0, connection) {
         }
 
         //Empfangen der Daten
-        var exchange = 'checked-data';
+        var exchange = 'aggregated-data';
         channel.assertExchange(exchange, 'topic', {
             durable: false
         });
