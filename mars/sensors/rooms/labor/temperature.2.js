@@ -9,9 +9,8 @@ let sensorid = 2
 
 senddata()
 
-function getTemperature() {
-    var data = Math.random() * 10
-    return data
+function getTemperature(min, max) {
+    return Math.random() * (max - min) + min;
 }
 
 function senddata() {
@@ -34,7 +33,7 @@ function senddata() {
 
             setInterval(() => {
                 async function getdata() {
-                    let data = await getTemperature()
+                    let data = await getTemperature(23, 25)
                     channel.publish(exchange, sensorroom + '.' + sensortype + '.' + sensorid, Buffer.from(data.toExponential));
                     console.log(" [sensor] " + sensorroom + '.' + sensortype + '.' + sensorid + " sent data: " + data);
                 }
