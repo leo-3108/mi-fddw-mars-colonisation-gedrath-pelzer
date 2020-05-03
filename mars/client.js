@@ -1,3 +1,12 @@
+/**
+ * Client des Mars (Es kann sich hier um einen Raum oder Astronauten)
+ * 
+ * - Zu bestimmten Messdaten von Räumen (de-)abbonieren
+ * - Abbonierte Messdaten empfangen
+ * - Kritische Warnmeldungen zu allen Räumen empfangen
+ * - Mit spezifischem Client auf der Erde kommunizieren.
+ */
+
 var amqp = require('amqplib/callback_api');
 var config = require('../_config/config.mars.json')
 
