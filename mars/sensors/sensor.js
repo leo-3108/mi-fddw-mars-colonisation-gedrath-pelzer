@@ -3,7 +3,7 @@
  */
  var config = require('../../_config/config.mars.json')
 const amqplib = require('amqplib')
-const loggerModule = require('logger')
+const loggerModule = require('logging')
 
 exports.start = (data = () => {}, room, type, id, interval = 10) => {
 
