@@ -42,6 +42,11 @@ open.then(connection => {
         durable: false
     })
 
+    // Subscribing
+    const subs_exch = await channel.assertExchange(config.amqp.exch.subs, 'topic', {
+        durable: false
+    })
+
     // establish own queue
     await channel.assertQueue('', {
             exclusive: true
@@ -81,3 +86,37 @@ const saveData = (message) => fs.appendFile(
     'mars/client/data.' + clientID + '.json',
     message + "\n"
 )
+
+const subscribe = async (channel, queue, subs_exch, enduser_exch, place) => {
+    // send message to system
+    await channel.publish(
+        subs_exch.exchange,
+        'subscribe',
+        Buffer.from(JSON.stringify({
+            "place": place,
+            "clientID": clientID
+        }))
+    )
+
+    // look for new topic
+    channel.bindQueue(queue, enduser_exch.exchange, place + '.normal')
+
+    logger.info(`[√] Subscribed to: ${place}`);
+}
+
+const desubscribe = async (channel, queue, subs_exch, enduser_exch, place) => {
+    // send message to system
+    await channel.publish(
+        subs_exch.exchange,
+        'desubscribe',
+        Buffer.from(JSON.stringify({
+            "place": place,
+            "clientID": clientID
+        }))
+    )
+
+    // stop looking for topic
+    channel.unbindQueue(queue, enduser_exch.exchange, place + '.normal')
+
+    logger.info(`[X] Desubscribed from: ${place}`);
+}
