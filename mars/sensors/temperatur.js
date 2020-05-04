@@ -1,6 +1,12 @@
 const sensor = require('./sensor')
 
-var getRandom = (min, max) => Math.random() * (max - min) + min
+var random = (min, max) => {
+    return () => {
+        return Math.random() * (min - max) + min
+    }
+}
 
-sensor.start(() => {getRandom(23, 25)}, 'labor', 'temperatur', 1)
+sensor.start(random(20, 25), 'labor', 'temperatur', 1)
+
+sensor.start(random(20, 25), 'labor', 'temperatur', 2)
 
