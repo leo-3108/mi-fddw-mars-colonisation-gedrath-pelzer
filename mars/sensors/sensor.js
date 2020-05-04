@@ -17,7 +17,7 @@ exports.start = (getdata, room, type, id, interval = 3) => {
         return connection.createChannel()
     }).then(channel => {
 
-        channel.assertExchange(config.amqp.exch.monitor, 'topic', {
+        channel.assertExchange(config.amqp.exch.sensor, 'topic', {
             durable: false
         }).then(exch => {
 
