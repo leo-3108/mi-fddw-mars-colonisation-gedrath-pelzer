@@ -23,13 +23,16 @@ exports.start = (getdata, room, type, id, interval = 3) => {
 
             // Start sending the request every $interval seconds
             setInterval(async () => {
-                if (channel.publish(exch.exchange, room + '.' + type + '.' + id + '.normal', Buffer.from(getdata().toString())))
-                    output.info("✅ Sent Sensor data to Brocker")
+                let data = getdata().toString()
+                if (channel.publish(exch.exchange, room + '.' + type + '.' + id + '.normal', Buffer.from(data)))
+                    output.info("✅ Sent Sensor data to Brocker – " + data)
                 else
                     output.error("Error accourd while sending data to Brocker")
 
             }, interval * 1000)
 
+        }).catch(err => {
+            throw err
         })
 
     }).catch(err => {
