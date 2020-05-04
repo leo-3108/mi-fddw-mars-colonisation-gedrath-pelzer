@@ -30,7 +30,7 @@ exports.start = (min, max, room, type, id, interval = 3) => {
 
             // Start sending the request every $interval seconds
             setInterval(async () => {
-                if (channel.publish(exch.exchange, room + '.' + type + '.' + id + '.normal', Buffer.from([data(min, max)])))
+                if (channel.publish(exch.exchange, room + '.' + type + '.' + id + '.normal', Buffer.from(data(min, max).toString())))
                     logger.info("✅ Sent Sensor data to Brocker")
                 else
                     logger.error("Error accourd while sending data to Brocker")
