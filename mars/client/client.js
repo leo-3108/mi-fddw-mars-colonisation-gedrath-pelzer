@@ -33,7 +33,7 @@ open.then(connection => {
 }).then(async channel => {
 
     // Empfangen der Sensor-Daten
-    const sensor_exch = await channel.assertExchange(config.amqp.exch.sensor, 'topic', {
+    const security_exch = await channel.assertExchange(config.amqp.exch.security, 'topic', {
         durable: false
     })
 
@@ -42,22 +42,42 @@ open.then(connection => {
         durable: false
     })
 
-    channel.assertQueue('', {
-        exclusive: true
-    }, function (error2, q) {
-        if (error2) {
-            throw error2;
-        }
-        console.log(' [*] Waiting for data. To exit press CTRL+C');
+    // establish own queue
+    await channel.assertQueue('', {
+            exclusive: true
+    }).then((q) => {
+        output.info("Started Client", clientID, "- To exit press CTRL+C")
+        output.info("[i] To Subscribe to a place write   's {place}'")
+        output.info("[i] To Desubscribe to a place write 'd {place}'")
 
-        channel.bindQueue(q.queue, exchange1, '#');
+        // listen everything from security
+        channel.bindQueue(q.queue, security_exch.exchange, '#');
 
-        channel.consume(q.queue, function (msg) {
-            console.log(" [x] Get data from " + msg.fields.routingKey);
+        // consume
+        channel.consume(q.queue, async message => {
+            if (message.content) {
+                await saveData(message.content.toString())
+                logger.info(message.fields.routingKey, "-", 'Saved Data to File')
+            }
         }, {
+            // automatic acknowledgment mode,
+            // see https://www.rabbitmq.com/confirms.html for details
             noAck: true
-        });
-    });
+        })
+
+
+    }).catch(err => {
+        throw err
+    })
 }).catch(err => {
     throw err
 })
+
+/**
+ * Schreibt die Daten in eine clientID spezifische Datei
+ * @param {String} message Nachricht, die abgespeichert werden soll
+ */
+const saveData = (message) => fs.appendFile(
+    'mars/client/data.' + clientID + '.json',
+    message + "\n"
+)

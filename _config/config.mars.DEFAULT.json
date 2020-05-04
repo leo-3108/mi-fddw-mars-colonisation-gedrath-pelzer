@@ -7,7 +7,10 @@
         "exch": {
             "monitor": "monitor_log",
             "enduser": "enduser",
-            "subs": "subscriptions"
+            "subs": "subscriptions",
+            "sensor": "sensor-data",
+            "aggregator": "aggregated-data",
+            "security": "security"
         }
     }
 }
