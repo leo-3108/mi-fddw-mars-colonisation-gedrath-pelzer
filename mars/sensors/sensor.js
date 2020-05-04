@@ -1,15 +1,15 @@
 /** 
  * Default function for sending Sensor Data
  */
- var config = require('../../_config/config.mars.json')
+var config = require('../../_config/config.mars.json')
 const amqplib = require('amqplib')
 const loggerModule = require('logging')
 
-exports.start = (data = () => {}, room, type, id, interval = 10) => {
+exports.start = (data = () => { }, room, type, id, interval = 10) => {
 
     const logger = loggerModule.default(room + '.' + type + '.' + id)
 
-    logger.info(`Started monitoring for ${key}API - To exit press CTRL+C`)
+    logger.info('Started monitoring for ' + room + '.' + id + ' - To exit press CTRL+C')
 
     var open = amqplib.connect(config.amqp.url)
 
