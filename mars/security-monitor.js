@@ -1,5 +1,8 @@
 var amqp = require('amqplib/callback_api');
 var config = require('../_config/config.mars.json')
+const logging = require('logging')
+
+const output = logging.default('Security-Monitor')
 
 amqp.connect(config.amqp.url, function (error0, connection) {
     if (error0) {
@@ -10,21 +13,15 @@ amqp.connect(config.amqp.url, function (error0, connection) {
             throw error1;
         }
 
-        //Empfangen der Daten
-        var exchange1 = 'sensor-data';
-        channel.assertExchange(exchange1, 'topic', {
-            durable: false
-        });
-
-        //Weiterleiten der Daten
-        var exchange2 = 'checked-data';
-        channel.assertExchange(exchange2, 'topic', {
+        //SensorDaten
+        var exchsensor = config.amqp.exch.sensor;
+        channel.assertExchange(exchsensor, 'topic', {
             durable: false
         });
 
         //Fehlermeldungen
-        var exchange3 = 'error';
-        channel.assertExchange(exchange3, 'topic', {
+        var exchenduser = config.amqp.exch.enduser;
+        channel.assertExchange(exchenduser, 'topic', {
             durable: false
         });
 
@@ -34,17 +31,20 @@ amqp.connect(config.amqp.url, function (error0, connection) {
             if (error2) {
                 throw error2;
             }
-            console.log(' [*] Waiting for data. To exit press CTRL+C');
 
-            channel.bindQueue(q.queue, exchange1, '#');
+            output.info('Waiting for data - To exit press CTRL+C')
+
+            channel.bindQueue(q.queue, exchsensor, '#');
 
             channel.consume(q.queue, function (msg) {
-                console.log(" [x] Get data from " + msg.fields.routingKey);
+                output.info('Get data from ' + msg.fields.routingKey + ' - ' + msg.content);
 
-                //Anwendungslogik
-                //...
-
-                senddata(msg.fields.routingKey, msg.content, channel, exchange2)
+                if (msg.content <= 20.5 || msg.content >= 24.5) {
+                    senderror(msg.fields.routingKey, msg.content, channel, exchenduser)
+                }
+                else {
+                    senddata(msg.fields.routingKey, msg.content, channel, exchenduser)
+                }
 
             }, {
                 noAck: true
@@ -52,14 +52,18 @@ amqp.connect(config.amqp.url, function (error0, connection) {
         });
     });
 
+    const okay = logging.default('🟢')
+    const error = logging.default('🔴')
 
-    function senddata(key, content, channel, exchange) {
+    function senddata(key, content, channel, exchenduser) {
         //Code zum weiterleiten
-        channel.publish(exchange, key, Buffer.from(content));
+        channel.publish(exchenduser, key, Buffer.from(content));
+        okay.info('Sent data ' + key);
     }
 
-    function senderror(key, content, channel, exchange3) {
+    function senderror(key, content, channel, exchenduser) {
         //Code zum Senden einer Warnung
-        channel.publish(exchange, key, Buffer.from(content));
+        channel.publish(exchenduser, key, Buffer.from(content));
+        error.info('Sent Error ');
     }
 })
