@@ -58,12 +58,14 @@ amqp.connect(config.amqp.url, function (error0, connection) {
     function senddata(key, content, channel, exchenduser) {
         //Code zum weiterleiten
         channel.publish(exchenduser, key, Buffer.from(content));
-        okay.info('Sent data ' + key);
+        okay.info('Sent data - ' + key);
     }
 
     function senderror(key, content, channel, exchenduser) {
         //Code zum Senden einer Warnung
-        channel.publish(exchenduser, key, Buffer.from(content));
-        error.info('Sent Error ');
+        var keytmp = key.split('.')
+
+        channel.publish(exchenduser, keytmp[0] + '.' + keytmp[1] + '.' + keytmp[2] + '.error', Buffer.from(content));
+        error.info('Sent error - ' + keytmp[0] + '.' + keytmp[1] + '.' + keytmp[2] + '.error');
     }
 })
