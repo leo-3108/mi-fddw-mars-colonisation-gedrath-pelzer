@@ -6,6 +6,8 @@ const output = logging.default('Security-Monitor')
 const okay = logging.default('🟢')
 const error = logging.default('🔴')
 
+output.info('Waiting for data - To exit press CTRL+C')
+
 amqp.connect(config.amqp.url, function (error0, connection) {
     if (error0) {
         throw error0;
@@ -15,21 +17,21 @@ amqp.connect(config.amqp.url, function (error0, connection) {
             throw error1;
         }
 
-        // Sensor-Daten
+        // Sensor-Daten empfangen
         var sensor_exch = config.amqp.exch.sensor
         channel.assertExchange(sensor_exch, 'topic', {
             durable: false
         });
 
-        //Fehlermeldungen
-        var security_exch = config.amqp.exch.security
-        channel.assertExchange(security_exch, 'topic', {
+        //Fehlermeldungen senden
+        var enduser_exch = config.amqp.exch.enduser
+        channel.assertExchange(enduser_exch, 'topic', {
             durable: false
         });
 
-        //Fehlermeldungen
-        var enduser_exch = config.amqp.exch.enduser
-        channel.assertExchange(enduser_exch, 'topic', {
+        //Daten weiterleiten
+        var aggregator_exch = config.amqp.exch.aggregator
+        channel.assertExchange(aggregator_exch, 'topic', {
             durable: false
         });
 
@@ -49,10 +51,8 @@ amqp.connect(config.amqp.url, function (error0, connection) {
                     senderror(msg.fields.routingKey, msg.content, channel, enduser_exch)
                 }
                 else {
-                    senddata(msg.fields.routingKey, msg.content, channel, security_exch)
+                    senddata(msg.fields.routingKey, msg.content, channel, aggregator_exch)
                 }
-
-
             }, {
                 noAck: true
             });
@@ -61,15 +61,17 @@ amqp.connect(config.amqp.url, function (error0, connection) {
 
     function senddata(key, content, channel, exchange) {
         //Code zum weiterleiten
-        channel.publish(exchange, key, Buffer.from(content));
-        okay.info('Sent data - ' + key);
+        var keytmp = key.split('.')
+
+        channel.publish(exchange, 'sensor' + '.' + keytmp[1] + '.normal', Buffer.from(content));
+        okay.info('Sent data - ' + 'sensor' + '.' + keytmp[1] + '.normal');
     }
 
     function senderror(key, content, channel, exchange) {
         //Code zum Senden einer Warnung
         var keytmp = key.split('.')
 
-        channel.publish(exchange, keytmp[0] + '.' + keytmp[1] + '.error', Buffer.from(content));
-        error.info('Sent error - ' + keytmp[0] + '.' + keytmp[1] + '.error');
+        channel.publish(exchange, 'sensor' + '.' + keytmp[1] + '.error', Buffer.from(content));
+        error.info('Sent error - ' + 'sensor' + '.' + keytmp[1] + '.error');
     }
 })

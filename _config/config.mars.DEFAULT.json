@@ -6,7 +6,7 @@
         "url": "amqp://USER:PWD@HOSTADRESS/USER",
         "exch": {
             "sensor": "sensor",
-            "security": "security",
+            "aggregator": "aggregator",
             "enduser": "enduser",
             "subs": "subscription",
             "communication": "communication"
