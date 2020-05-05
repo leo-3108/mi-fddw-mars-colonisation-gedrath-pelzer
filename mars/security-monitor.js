@@ -15,9 +15,8 @@ amqp.connect(config.amqp.url, function (error0, connection) {
             throw error1;
         }
 
-        //SensorDaten
-        var exchsensor = config.amqp.exch.sensor;
-        channel.assertExchange(exchsensor, 'topic', {
+        // Sensor-Daten
+        const sensor_exch = channel.assertExchange(config.amqp.exch.sensor, 'topic', {
             durable: false
         });
 
@@ -33,11 +32,9 @@ amqp.connect(config.amqp.url, function (error0, connection) {
             if (error2) {
                 throw error2;
             }
-
-            output.info('Waiting for data - To exit press CTRL+C')
-
-            channel.bindQueue(q.queue, exchsensor, '#');
-
+          
+            channel.bindQueue(q.queue, sensor_exch.exchange, '#');
+          
             channel.consume(q.queue, function (msg) {
                 output.info('Get data from ' + msg.fields.routingKey + ' - ' + msg.content);
 
