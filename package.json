@@ -5,7 +5,8 @@
     "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "sensors": "node mars/sensors/temperatur.js labor1 & node mars/sensors/temperatur.js kitchen"
+        "sensors": "node mars/sensors/temperatur.js labor1 & node mars/sensors/temperatur.js kitchen",
+        "mars-client": "node mars/client/client.js"
     },
     "author": "",
     "license": "ISC",
