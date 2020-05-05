@@ -15,7 +15,7 @@ if (args.length == 0) {
  */
 var random = (min, max) => {
     return () => {
-        return Math.random() * (min - max) + min
+        return Math.random() * (max - min) + min
     }
 }
 
