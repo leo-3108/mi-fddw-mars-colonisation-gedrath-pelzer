@@ -5,9 +5,10 @@
         "password": "PWD",
         "url": "amqp://USER:PWD@HOSTADRESS/USER",
         "exch": {
-            "monitor": "monitor_log",
+            "sensor": "sensor",
             "enduser": "enduser",
-            "subs": "subscriptions"
+            "subs": "subscription",
+            "communication": "communication"
         }
     }
 }
