@@ -11,5 +11,15 @@
             "subs": "subscription",
             "communication": "communication"
         }
+    },
+    "sensors": {
+        "temperature": {
+            "min": "minvalue",
+            "max": "maxvalue"
+        },
+        "humidity": {
+            "min": "minvalue",
+            "max": "maxvalue"
+        }
     }
 }

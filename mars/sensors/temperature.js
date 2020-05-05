@@ -20,5 +20,5 @@ var random = (min, max) => {
 }
 
 // start process
-sensor.start(random(20, 25), args.join(' '), 'temperatur', 1)
+sensor.start(random(20, 25), args.join(' '), 'temperature', 1)
 
