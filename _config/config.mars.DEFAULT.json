@@ -5,7 +5,8 @@
         "password": "PWD",
         "url": "amqp://USER:PWD@HOSTADRESS/USER",
         "exch": {
-            "sensor": "sensoren",
+            "sensor": "sensor",
+            "aggregator": "aggregator",
             "enduser": "enduser",
             "subs": "subscription",
             "communication": "communication"
