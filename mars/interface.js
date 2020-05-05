@@ -1,1 +1,6 @@
-//Mars-Interface, welches die Verbindung zur Erde herstellt und alle Daten empfängt
+/**
+ * Mars-Interface
+ * 
+ * - Weiterleitung der Daten aus dem Erd-Netz in das Mars-Netz
+ * - Simulation eines Delays
+ */
