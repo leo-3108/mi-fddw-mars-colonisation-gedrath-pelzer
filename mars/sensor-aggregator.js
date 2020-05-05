@@ -13,15 +13,15 @@ amqp.connect(config.amqp.url, function (error0, connection) {
             throw error1;
         }
 
-        //SensorDaten
-        var exchsensor = config.amqp.exch.sensor;
-        channel.assertExchange(exchsensor, 'topic', {
+        //Daten empfangen
+        var aggregator_exch = config.amqp.exch.aggregator;
+        channel.assertExchange(aggregator_exch, 'topic', {
             durable: false
         });
 
-        //SensorDaten
-        var exchenduser = config.amqp.exch.enduser;
-        channel.assertExchange(exchenduser, 'topic', {
+        //Daten senden
+        var enduser_exch = config.amqp.exch.enduser;
+        channel.assertExchange(enduser_exch, 'topic', {
             durable: false
         });
 
@@ -34,14 +34,14 @@ amqp.connect(config.amqp.url, function (error0, connection) {
 
             output.info('Waiting for data - To exit press CTRL+C')
 
-            channel.bindQueue(q.queue, exchsensor, '#');
+            channel.bindQueue(q.queue, aggregator_exch, '#');
 
             channel.consume(q.queue, function (msg) {
                 output.info('Get data from ' + msg.fields.routingKey + ' - ' + msg.content);
 
                 //Anwendungslogik...
 
-                senddata(msg.fields.routingKey, msg.content, channel, exchenduser)
+                senddata(msg.fields.routingKey, msg.content, channel, enduser_exch)
 
             }, {
                 noAck: true
@@ -49,10 +49,10 @@ amqp.connect(config.amqp.url, function (error0, connection) {
         });
     });
 
-    function senddata(key, content, channel, exchenduser) {
+    function senddata(key, content, channel, exchange) {
         //Code zum Senden der Daten
 
-        channel.publish(exchenduser, key, Buffer.from(content));
+        channel.publish(exchange, key, Buffer.from(content));
         output.info('Sent data - ' + key);
     }
 })
