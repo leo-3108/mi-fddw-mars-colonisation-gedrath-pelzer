@@ -17,6 +17,9 @@ const fs = require('fs').promises
 const shortid = require('shortid');
 const readline = require('readline')
 
+// packe settings
+shortid.characters('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ#$');
+
 // create process objects
 const clientID = shortid.generate()
 const output = logging.default('Client')
