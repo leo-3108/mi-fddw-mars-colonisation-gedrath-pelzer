@@ -32,18 +32,8 @@ open.then(connection => {
     return connection.createChannel()
 }).then(async channel => {
 
-    // Empfangen der Sensor-Daten
-    const security_exch = await channel.assertExchange(config.amqp.exch.security, 'topic', {
-        durable: false
-    })
-
-    // Empfangen der Fehlermeldungen
-    const aggregator_exch = await channel.assertExchange(config.amqp.exch.aggregator, 'topic', {
-        durable: false
-    })
-
-    // Subscribing
-    const subs_exch = await channel.assertExchange(config.amqp.exch.subs, 'topic', {
+    // incoming messages
+    const enduser_exch = await channel.assertExchange(config.amqp.exch.enduser, 'topic', {
         durable: false
     })
 
@@ -54,6 +44,7 @@ open.then(connection => {
         output.info("Started Client", clientID, "- To exit press CTRL+C")
         output.info("[i] To Subscribe to a place write   's {place}'")
         output.info("[i] To Desubscribe to a place write 'd {place}'")
+        output.info("[i] To Write a message write        'm {address} {message}'")
 
         // listen everything from security
         channel.bindQueue(q.queue, security_exch.exchange, '#');
@@ -70,6 +61,17 @@ open.then(connection => {
             noAck: true
         })
 
+        // readline
+        rl.on('line', input => {
+            let tmp = input.split(' ')
+
+            switch(temp[0]){
+                case 's': subscribe(channel, q.queue, enduser_exch, tmp[1].toLocaleLowerCase())
+                case 'd': desubscribe(channel, q.queue, enduser_exch, tmp[1].toLocaleLowerCase())
+                deafault: logger.error('First Argument must be one of the following: s, d')
+            }
+        });
+
 
     }).catch(err => {
         throw err
@@ -83,40 +85,22 @@ open.then(connection => {
  * @param {String} message Nachricht, die abgespeichert werden soll
  */
 const saveData = (message) => fs.appendFile(
-    'mars/client/data.' + clientID + '.json',
+    'mars/client/data.' + clientID + '.log',
     message + "\n"
 )
 
-const subscribe = async (channel, queue, subs_exch, enduser_exch, place) => {
-    // send message to system
-    await channel.publish(
-        subs_exch.exchange,
-        'subscribe',
-        Buffer.from(JSON.stringify({
-            "place": place,
-            "clientID": clientID
-        }))
-    )
+const subscribe_sensor = (channel, queue, enduser_exch, room) => {
 
     // look for new topic
-    channel.bindQueue(queue, enduser_exch.exchange, place + '.normal')
+    channel.bindQueue(queue, enduser_exch.exchange, 'sensor.' + room + '.normal')
 
-    logger.info(`[√] Subscribed to: ${place}`);
+    logger.info(`[√] Subscribed to: ${room}`);
 }
 
-const desubscribe = async (channel, queue, subs_exch, enduser_exch, place) => {
-    // send message to system
-    await channel.publish(
-        subs_exch.exchange,
-        'desubscribe',
-        Buffer.from(JSON.stringify({
-            "place": place,
-            "clientID": clientID
-        }))
-    )
+const desubscribe_sensor = (channel, queue, enduser_exch, room) => {
 
     // stop looking for topic
-    channel.unbindQueue(queue, enduser_exch.exchange, place + '.normal')
+    channel.unbindQueue(queue, enduser_exch.exchange, 'sensor.' + room + '.normal')
 
-    logger.info(`[X] Desubscribed from: ${place}`);
+    logger.info(`[X] Desubscribed from: ${room}`);
 }
