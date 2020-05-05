@@ -16,12 +16,14 @@ amqp.connect(config.amqp.url, function (error0, connection) {
         }
 
         // Sensor-Daten
-        const sensor_exch = channel.assertExchange(config.amqp.exch.sensor, 'topic', {
+        var sensor_exch = config.amqp.exch.sensor
+        channel.assertExchange(sensor_exch, 'topic', {
             durable: false
         });
 
         //Fehlermeldungen
-        var security_exch = channel.assertExchange(config.amqp.exch.security, 'topic', {
+        var security_exch = config.amqp.exch.security
+        channel.assertExchange(security_exch, 'topic', {
             durable: false
         });
 
@@ -32,7 +34,7 @@ amqp.connect(config.amqp.url, function (error0, connection) {
                 throw error2;
             }
 
-            channel.bindQueue(q.queue, sensor_exch.exchange, '#');
+            channel.bindQueue(q.queue, sensor_exch, '#');
 
             channel.consume(q.queue, function (msg) {
                 output.info('Get data from ' + msg.fields.routingKey + ' - ' + msg.content);
@@ -54,7 +56,7 @@ amqp.connect(config.amqp.url, function (error0, connection) {
     function senddata(key, content, channel, exchange) {
         //Code zum weiterleiten
         channel.publish(exchange, key, Buffer.from(content));
-        okay.info('Sent data ' + key);
+        okay.info('Sent data - ' + key);
     }
 
     function senderror(key, content, channel, exchange) {
