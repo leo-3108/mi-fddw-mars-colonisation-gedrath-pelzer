@@ -20,7 +20,7 @@ const readline = require('readline')
 // create process objects
 const clientID = uuid()
 const output = logging.default('Client')
-const open = amqplib.connect(config.amqp.url)
+const open = amqp.connect(config.amqp.url)
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
@@ -46,14 +46,14 @@ open.then(connection => {
         output.info("[i] To Desubscribe to a place write 'd {place}'")
         output.info("[i] To Write a message write        'm {address} {message}'")
 
-        // listen everything from security
-        channel.bindQueue(q.queue, security_exch.exchange, '#');
+        // listen everything with critical info
+        channel.bindQueue(q.queue, enduser_exch.exchange, 'sensor.#.error');
 
         // consume
         channel.consume(q.queue, async message => {
             if (message.content) {
                 await saveData(message.content.toString())
-                logger.info(message.fields.routingKey, "-", 'Saved Data to File')
+                output.info(message.fields.routingKey, "-", 'Saved Data to File')
             }
         }, {
             // automatic acknowledgment mode,
@@ -65,10 +65,14 @@ open.then(connection => {
         rl.on('line', input => {
             let tmp = input.split(' ')
 
-            switch(temp[0]){
-                case 's': subscribe(channel, q.queue, enduser_exch, tmp[1].toLocaleLowerCase())
-                case 'd': desubscribe(channel, q.queue, enduser_exch, tmp[1].toLocaleLowerCase())
-                deafault: logger.error('First Argument must be one of the following: s, d')
+            switch (tmp[0]) {
+                case 's': subscribe_sensor(channel, q.queue, enduser_exch, tmp[1].toLocaleLowerCase())
+                break;
+
+                case 'd': desubscribe_sensor(channel, q.queue, enduser_exch, tmp[1].toLocaleLowerCase())
+                break;
+
+                default: output.error('First Argument must be one of the following: s, d')
             }
         });
 
@@ -94,7 +98,7 @@ const subscribe_sensor = (channel, queue, enduser_exch, room) => {
     // look for new topic
     channel.bindQueue(queue, enduser_exch.exchange, 'sensor.' + room + '.normal')
 
-    logger.info(`[√] Subscribed to: ${room}`);
+    output.info(`[√] Subscribed to: ${room}`);
 }
 
 const desubscribe_sensor = (channel, queue, enduser_exch, room) => {
@@ -102,5 +106,5 @@ const desubscribe_sensor = (channel, queue, enduser_exch, room) => {
     // stop looking for topic
     channel.unbindQueue(queue, enduser_exch.exchange, 'sensor.' + room + '.normal')
 
-    logger.info(`[X] Desubscribed from: ${room}`);
+    output.info(`[X] Desubscribed from: ${room}`);
 }
