@@ -27,6 +27,12 @@ amqp.connect(config.amqp.url, function (error0, connection) {
             durable: false
         });
 
+        //Fehlermeldungen
+        var enduser_exch = config.amqp.exch.enduser
+        channel.assertExchange(enduser_exch, 'topic', {
+            durable: false
+        });
+
         channel.assertQueue('', {
             exclusive: true
         }, function (error2, q) {
@@ -40,7 +46,7 @@ amqp.connect(config.amqp.url, function (error0, connection) {
                 output.info('Get data from ' + msg.fields.routingKey + ' - ' + msg.content);
 
                 if (msg.content <= 20.5 || msg.content >= 24.5) {
-                    senderror(msg.fields.routingKey, msg.content, channel, security_exch)
+                    senderror(msg.fields.routingKey, msg.content, channel, enduser_exch)
                 }
                 else {
                     senddata(msg.fields.routingKey, msg.content, channel, security_exch)
@@ -63,7 +69,7 @@ amqp.connect(config.amqp.url, function (error0, connection) {
         //Code zum Senden einer Warnung
         var keytmp = key.split('.')
 
-        channel.publish(exchange, keytmp[0] + '.' + keytmp[1] + '.' + keytmp[2] + '.error', Buffer.from(content));
-        error.info('Sent error - ' + keytmp[0] + '.' + keytmp[1] + '.' + keytmp[2] + '.error');
+        channel.publish(exchange, keytmp[0] + '.' + keytmp[1] + '.error', Buffer.from(content));
+        error.info('Sent error - ' + keytmp[0] + '.' + keytmp[1] + '.error');
     }
 })
