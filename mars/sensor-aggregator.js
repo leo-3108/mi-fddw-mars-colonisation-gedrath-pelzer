@@ -51,8 +51,9 @@ amqp.connect(config.amqp.url, function (error0, connection) {
 
     function senddata(key, content, channel, exchange) {
         //Code zum Senden der Daten
+        var keytmp = key.split('.')
 
-        channel.publish(exchange, key, Buffer.from(content));
-        output.info('Sent data - ' + key);
+        channel.publish(exchange, 'sensor' + '.' + keytmp[1] + '.normal', Buffer.from(content));
+        output.info('Sent data - ' + 'sensor' + '.' + keytmp[1] + '.normal');
     }
 })

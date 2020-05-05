@@ -61,7 +61,6 @@ amqp.connect(config.amqp.url, function (error0, connection) {
 
     function senddata(key, content, channel, exchange) {
         //Code zum weiterleiten
-        var keytmp = key.split('.')
 
         channel.publish(exchange, key, Buffer.from(content));
         okay.info('Sent data - ' + key);
