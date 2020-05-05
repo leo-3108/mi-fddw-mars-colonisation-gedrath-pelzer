@@ -6,6 +6,8 @@ const output = logging.default('Security-Monitor')
 const okay = logging.default('🟢')
 const error = logging.default('🔴')
 
+output.info('Waiting for data - To exit press CTRL+C')
+
 amqp.connect(config.amqp.url, function (error0, connection) {
     if (error0) {
         throw error0;
