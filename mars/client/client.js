@@ -57,6 +57,8 @@ open.then(connection => {
         // listen everything with critical info
         channel.bindQueue(q.queue, enduser_exch.exchange, 'sensor.#.error');
 
+        // listen to messages from earth
+
         // consume
         channel.consume(q.queue, async message => {
             if (message.content) {
@@ -75,14 +77,11 @@ open.then(connection => {
 
             switch (tmp[0]) {
                 case 's': subscribe_sensor(channel, q.queue, enduser_exch, tmp[1].toLocaleLowerCase())
-                break;
-
+                    break;
                 case 'd': desubscribe_sensor(channel, q.queue, enduser_exch, tmp[1].toLocaleLowerCase())
-                break;
-
+                    break;
                 case 'm': send_message(channel, comm_exch, tmp[1], tmp.slice(2).join(' '))
-                break;
-
+                    break;
                 default: output.error('First Argument must be one of the following: s, d')
             }
         });
@@ -103,6 +102,44 @@ const saveData = (message) => fs.appendFile(
     'mars/client/data.' + clientID + '.log',
     message + "\n"
 )
+
+/**
+ * Wandelt die Topics aus dem Enduser exchange um
+ * @param {String} routing_key Topic der Nachricht
+ * 
+ * @return {Object} Jedes Attribut der Nachricht ist ein Topic 
+ */
+const enduser_topics = (routing_key) => {
+    let array = routing_key.split('.')
+
+    switch(array[0]){
+        case 'sensor':
+            // sensor data
+            return {
+                type: array[0],
+                room: array[1],
+                status: array[2],
+                keys: array
+            }
+            break;
+
+        case 'earth':
+            // data from earth
+            return {
+                type: array[0] + '.' + array[1],
+                room: array[1],
+                status: array[2],
+                keys: array
+            }
+            break;
+
+        default:
+            return {
+                keys: array
+            }
+    }
+}
+
 
 /**
  * Abonniert Sensor Daten zu einem bestimmtem Raum
