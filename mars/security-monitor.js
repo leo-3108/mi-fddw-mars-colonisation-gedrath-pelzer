@@ -3,6 +3,8 @@ var config = require('../_config/config.mars.json')
 const logging = require('logging')
 
 const output = logging.default('Security-Monitor')
+const okay = logging.default('🟢')
+const error = logging.default('🔴')
 
 amqp.connect(config.amqp.url, function (error0, connection) {
     if (error0) {
@@ -43,7 +45,7 @@ amqp.connect(config.amqp.url, function (error0, connection) {
                     senderror(msg.fields.routingKey, msg.content, channel, exchenduser)
                 }
                 else {
-                    senddata(msg.fields.routingKey, msg.content, channel, exchenduser)
+                    okay.info('Data okay - ' + msg.fields.routingKey)
                 }
 
             }, {
@@ -51,15 +53,6 @@ amqp.connect(config.amqp.url, function (error0, connection) {
             });
         });
     });
-
-    const okay = logging.default('🟢')
-    const error = logging.default('🔴')
-
-    function senddata(key, content, channel, exchenduser) {
-        //Code zum weiterleiten
-        channel.publish(exchenduser, key, Buffer.from(content));
-        okay.info('Sent data - ' + key);
-    }
 
     function senderror(key, content, channel, exchenduser) {
         //Code zum Senden einer Warnung
