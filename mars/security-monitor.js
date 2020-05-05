@@ -10,9 +10,8 @@ amqp.connect(config.amqp.url, function (error0, connection) {
             throw error1;
         }
 
-        //Empfangen der Daten
-        var exchange1 = 'sensor-data';
-        channel.assertExchange(exchange1, 'topic', {
+        // Sensor-Daten
+        const sensor_exch = channel.assertExchange(config.amqp.exch.sensor, 'topic', {
             durable: false
         });
 
@@ -36,7 +35,7 @@ amqp.connect(config.amqp.url, function (error0, connection) {
             }
             console.log(' [*] Waiting for data. To exit press CTRL+C');
 
-            channel.bindQueue(q.queue, exchange1, '#');
+            channel.bindQueue(q.queue, sensor_exch.exchange, '#');
 
             channel.consume(q.queue, function (msg) {
                 console.log(" [x] Get data from " + msg.fields.routingKey);

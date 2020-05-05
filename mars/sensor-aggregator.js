@@ -16,9 +16,8 @@ amqp.connect(config.amqp.url, function (error0, connection) {
             durable: false
         });
 
-        //Weiterleiten der Daten
-        var exchange2 = 'aggregated-data';
-        channel.assertExchange(exchange2, 'topic', {
+        // Weiterleiten der Daten
+        const enduser_exch = channel.assertExchange(config.amqp.exch.enduser, 'topic', {
             durable: false
         });
 
@@ -30,7 +29,7 @@ amqp.connect(config.amqp.url, function (error0, connection) {
             }
             console.log(' [*] Waiting for data. To exit press CTRL+C');
 
-            channel.bindQueue(q.queue, exchange1, '#');
+            channel.bindQueue(q.queue, enduser_exch.exchange, '#');
 
             channel.consume(q.queue, function (msg) {
                 console.log(" [x] Get data from " + msg.fields.routingKey);
