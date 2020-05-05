@@ -14,11 +14,11 @@ const config = require('../../_config/config.mars.json')
 const amqp = require('amqplib')
 const logging = require('logging')
 const fs = require('fs').promises
-const uuid = require('uuid').v1
+const shortid = require('shortid');
 const readline = require('readline')
 
 // create process objects
-const clientID = uuid()
+const clientID = shortid.generate()
 const output = logging.default('Client')
 const open = amqp.connect(config.amqp.url)
 const rl = readline.createInterface({
@@ -143,19 +143,24 @@ const desubscribe_sensor = (channel, queue, exch, room) => {
  */
 const send_message = (channel, exch, address, text) => {
 
-    // create payload
-    let payload = {
-        timestamp: Date.now(),
-        from: clientID,
-        to: address,
-        text: text
+    if(shortid.isValid(address)){
+        // create payload
+        let payload = {
+            timestamp: Date.now(),
+            from: clientID,
+            to: address,
+            text: text
+        }
+
+        // stop looking for topic
+        channel.publish(
+            exch.exchange,
+            address + '.normal',
+            Buffer.from(JSON.stringify(payload)))
+
+        output.info(`✅ Send message to: ${address}`);
     }
-
-    // stop looking for topic
-    channel.publish(
-        exch.exchange,
-        address + '.normal',
-        Buffer.from(JSON.stringify(payload)))
-
-    output.info(`✅ Send message to: ${address}`);
+    else{
+        output.error(`❌ The Address "${address}" doesn't seem to be corret`)
+    }
 }
