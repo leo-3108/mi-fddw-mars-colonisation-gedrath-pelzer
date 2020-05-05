@@ -1,11 +1,9 @@
 {
     "amqp": {
-        "host": "HOSTADRESS",
-        "user": "USER",
-        "password": "PWD",
         "url": "amqp://USER:PWD@HOSTADRESS/USER",
         "exch": {
             "sensor": "sensoren",
+            "aggregator": "aggregator",
             "enduser": "enduser",
             "subs": "subscription",
             "comm": "communication"
