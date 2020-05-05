@@ -47,12 +47,24 @@ amqp.connect(config.amqp.url, function (error0, connection) {
             channel.consume(q.queue, function (msg) {
                 output.info('Get data from ' + msg.fields.routingKey + ' - ' + msg.content);
 
-                if (msg.content <= 20.5 || msg.content >= 24.5) {
-                    senderror(msg.fields.routingKey, msg.content, channel, enduser_exch)
+                var keytmp = msg.fields.routingKey.split('.')
+
+                if (keytmp[2] == 'temperature') {
+                    if (msg.content <= config.sensors.temperature.min || msg.content >= config.sensors.temperature.max)
+                        senderror(msg.fields.routingKey, msg.content, channel, enduser_exch)
+
+                    else
+                        senddata(msg.fields.routingKey, msg.content, channel, aggregator_exch)
                 }
-                else {
-                    senddata(msg.fields.routingKey, msg.content, channel, aggregator_exch)
+
+                if (keytmp[2] == 'humidity') {
+                    if (msg.content <= config.sensors.humidity.min || msg.content >= config.sensors.humidity.max)
+                        senderror(msg.fields.routingKey, msg.content, channel, enduser_exch)
+
+                    else
+                        senddata(msg.fields.routingKey, msg.content, channel, aggregator_exch)
                 }
+
             }, {
                 noAck: true
             });
@@ -61,7 +73,6 @@ amqp.connect(config.amqp.url, function (error0, connection) {
 
     function senddata(key, content, channel, exchange) {
         //Code zum weiterleiten
-        var keytmp = key.split('.')
 
         channel.publish(exchange, key, Buffer.from(content));
         okay.info('Sent data - ' + key);
