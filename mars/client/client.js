@@ -37,6 +37,11 @@ open.then(connection => {
         durable: false
     })
 
+    // communication
+    const comm_exch = await channel.assertExchange(config.amqp.exch.comm, 'topic', {
+        durable: false
+    })
+
     // establish own queue
     await channel.assertQueue('', {
             exclusive: true
@@ -72,6 +77,9 @@ open.then(connection => {
                 case 'd': desubscribe_sensor(channel, q.queue, enduser_exch, tmp[1].toLocaleLowerCase())
                 break;
 
+                case 'm': send_message(channel, comm_exch, tmp[1], tmp.slice(2).join(' '))
+                break;
+
                 default: output.error('First Argument must be one of the following: s, d')
             }
         });
@@ -93,18 +101,61 @@ const saveData = (message) => fs.appendFile(
     message + "\n"
 )
 
-const subscribe_sensor = (channel, queue, enduser_exch, room) => {
+/**
+ * Abonniert Sensor Daten zu einem bestimmtem Raum
+ * 
+ * @param {Channel} channel Current AMQP-Channel
+ * @param {Queue} queue Own AMQPQueue
+ * @param {Exchange} exch AMQP-Exchnage
+ * @param {String} room ID of the room that we want to subscibe to
+ */
+const subscribe_sensor = (channel, queue, exch, room) => {
 
     // look for new topic
-    channel.bindQueue(queue, enduser_exch.exchange, 'sensor.' + room + '.normal')
+    channel.bindQueue(queue, exch.exchange, 'sensor.' + room + '.normal')
 
     output.info(`[√] Subscribed to: ${room}`);
 }
 
-const desubscribe_sensor = (channel, queue, enduser_exch, room) => {
+/**
+ * Deabonniert Sensor Daten zu einem bestimmtem Raum
+ * 
+ * @param {Channel} channel Current AMQP-Channel
+ * @param {Queue} queue Own AMQPQueue
+ * @param {Exchange} exch AMQP-Exchnage
+ * @param {String} room ID of the room that we want to subscibe to
+ */
+const desubscribe_sensor = (channel, queue, exch, room) => {
 
     // stop looking for topic
-    channel.unbindQueue(queue, enduser_exch.exchange, 'sensor.' + room + '.normal')
+    channel.unbindQueue(queue, exch.exchange, 'sensor.' + room + '.normal')
 
     output.info(`[X] Desubscribed from: ${room}`);
+}
+
+/**
+ * Sendet eine Nachricht an die Erde
+ * 
+ * @param {Channel} channel Current AMQP-Channel
+ * @param {Exchange} exch AMQP-Exchnage
+ * @param {String} address ID of recipient
+ * @param {String} message Message that will be sent to the recipient
+ */
+const send_message = (channel, exch, address, text) => {
+
+    // create payload
+    let payload = {
+        timestamp: Date.now(),
+        from: clientID,
+        to: address,
+        text: text
+    }
+
+    // stop looking for topic
+    channel.publish(
+        exch.exchange,
+        address + '.normal',
+        Buffer.from(JSON.stringify(payload)))
+
+    output.info(`✅ Send message to: ${address}`);
 }
