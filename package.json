@@ -7,7 +7,8 @@
         "test": "echo \"Error: no test specified\" && exit 1",
         "sensors": "node mars/sensors/temperatur.js labor1 & node mars/sensors/temperatur.js kitchen",
         "mars-client": "node mars/client/client.js",
-        "earth-client": "node earth/client.js"
+        "earth-client": "node earth/client.js",
+        "interfaces": "node mars/interface.js & node earth/interface.js"
     },
     "author": "",
     "license": "ISC",
