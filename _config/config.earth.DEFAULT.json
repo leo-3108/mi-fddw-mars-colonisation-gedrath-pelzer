@@ -7,7 +7,8 @@
         "exch": {
             "monitor": "monitor_log",
             "enduser": "enduser",
-            "subs": "subscriptions"
+            "subs": "subscriptions",
+            "comm": "communication"
         }
     }
 }

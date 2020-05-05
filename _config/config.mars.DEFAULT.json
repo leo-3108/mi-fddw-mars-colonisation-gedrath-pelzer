@@ -8,7 +8,7 @@
             "sensor": "sensoren",
             "enduser": "enduser",
             "subs": "subscription",
-            "communication": "communication"
+            "comm": "communication"
         }
     }
 }
