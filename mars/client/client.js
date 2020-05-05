@@ -58,12 +58,21 @@ open.then(connection => {
         channel.bindQueue(q.queue, enduser_exch.exchange, 'sensor.#.error');
 
         // listen to messages from earth
+        channel.bindQueue(q.queue, comm_exch.exchange, 'earth.message.' + clientID);
 
         // consume
         channel.consume(q.queue, async message => {
-            if (message.content) {
+            let routing_key = enduser_topics(message.fields.routingKey)
+
+            if (message.content && routing_key.type == 'sensor') {
                 await saveData(message.content.toString())
                 output.info(message.fields.routingKey, "-", 'Saved Data to File')
+            }
+            else if (message.content && routing_key.type == 'earth.message') {
+                let payload = JSON.parse(message.content.toString())
+                let date = new Date(payload.timestamp)
+
+                output.info(`📨 ${payload.from} schreibt um ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}\n${payload.text}`)
             }
         }, {
             // automatic acknowledgment mode,
@@ -121,7 +130,6 @@ const enduser_topics = (routing_key) => {
                 status: array[2],
                 keys: array
             }
-            break;
 
         case 'earth':
             // data from earth
@@ -131,7 +139,6 @@ const enduser_topics = (routing_key) => {
                 status: array[2],
                 keys: array
             }
-            break;
 
         default:
             return {
@@ -201,6 +208,6 @@ const send_message = (channel, exch, address, text) => {
         output.info(`✅ Send message to: ${address}`);
     }
     else{
-        output.error(`❌ The Address "${address}" doesn't seem to be corret`)
+        output.error(`The Address "${address}" doesn't seem to be corret`)
     }
 }
