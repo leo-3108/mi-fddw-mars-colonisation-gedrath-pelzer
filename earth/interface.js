@@ -16,18 +16,18 @@ const util = require('util');
 const setTimeoutPromise = util.promisify(setTimeout);
 
 // create process objects
-const output = logging.default('Mars-Interface')
+const output = logging.default('Earth-Interface')
 const mars = amqp.connect(config_mars.amqp.url)
 const earth = amqp.connect(config_earth.amqp.url)
 
 
 // start process
-mars.then(connection => {
+earth.then(connection => {
     return connection.createChannel()
 }).then(async channel => {
 
     // incoming messages
-    const mars_comm_exch = await channel.assertExchange(config_mars.amqp.exch.comm, 'topic', {
+    const earth_comm_exch = await channel.assertExchange(config_earth.amqp.exch.comm, 'topic', {
         durable: false
     })
 
@@ -35,30 +35,30 @@ mars.then(connection => {
     await channel.assertQueue('', {
         exclusive: true
     }).then((q) => {
-        output.info("Started Mars-Interface - To exit press CTRL+C")
+        output.info("Started Earth-Interface - To exit press CTRL+C")
 
         // listen to communication exchange
-        channel.bindQueue(q.queue, mars_comm_exch.exchange, '#.normal')
+        channel.bindQueue(q.queue, earth_comm_exch.exchange, '#.normal')
 
         // consume
         channel.consume(q.queue, message => {
 
             output.info('Message Received – Wait for 3 Secs')
 
-            // waiting simulates the travel time from mars to earth
+            // waiting simulates the travel time from earth to mars
             setTimeoutPromise(60 * 3).then(async () => {
 
-                // connect to earth
-                await earth.then(earth_connection => {
-                    return earth_connection.createChannel()
-                }).then(async earth_channel => {
+                // connect to mars
+                await mars.then(mars_connection => {
+                    return mars_connection.createChannel()
+                }).then(async mars_channel => {
 
-                    const earth_comm_exch = await channel.assertExchange(config_earth.amqp.exch.comm, 'topic', {
+                    const mars_comm_exch = await channel.assertExchange(config_mars.amqp.exch.comm, 'topic', {
                         durable: false
                     })
 
-                    if (channel.publish(exch.exchange, message.fields.routingKey, message.content))
-                        output.info("✅ Sent data to Earth 🌍 from " + message.fields.exchange)
+                    if (mars_channel.publish(mars_comm_exch.exchange, message.fields.routingKey, message.content))
+                        output.info("✅ Sent data to Mars 👽 from " + message.fields.exchange)
                     else
                         output.error("Error accourd while sending data to Brocker")
 
