@@ -53,6 +53,6 @@ amqp.connect(config.amqp.url, function (error0, connection) {
         //Code zum Senden der Daten
 
         channel.publish(exchenduser, key, Buffer.from(content));
-        error.info('Sent data - ' + key);
+        output.info('Sent data - ' + key);
     }
 })
