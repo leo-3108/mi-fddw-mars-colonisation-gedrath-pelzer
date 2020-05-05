@@ -57,7 +57,7 @@ mars.then(connection => {
                         durable: false
                     })
 
-                    if (channel.publish(exch.exchange, message.fields.routingKey, message.content))
+                    if (earth_channel.publish(earth_comm_exch.exchange, message.fields.routingKey, message.content))
                         output.info("✅ Sent data to Earth 🌍 from " + message.fields.exchange)
                     else
                         output.error("Error accourd while sending data to Brocker")
