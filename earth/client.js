@@ -40,7 +40,7 @@ open.then(connection => {
         exclusive: true
     }).then((q) => {
         output.info("Started Client", clientID, "- To exit press CTRL+C")
-        output.info("[i] To Write a message write        'm {address} {message}'")
+        output.info("[i] To Write a message write 'm {address} {message}'")
 
         // listen to messages from earth
         channel.bindQueue(q.queue, comm_exch.exchange, clientID + 'normal')
@@ -65,12 +65,6 @@ open.then(connection => {
             let tmp = input.split(' ')
 
             switch (tmp[0]) {
-                case 's':
-                    subscribe_sensor(channel, q.queue, enduser_exch, tmp[1].toLocaleLowerCase())
-                    break;
-                case 'd':
-                    desubscribe_sensor(channel, q.queue, enduser_exch, tmp[1].toLocaleLowerCase())
-                    break;
                 case 'm':
                     send_message(channel, comm_exch, tmp[1], tmp.slice(2).join(' '))
                     break;
