@@ -47,7 +47,7 @@ open.then(connection => {
 
     // establish own queue
     await channel.assertQueue('', {
-            exclusive: true
+        exclusive: true
     }).then((q) => {
         output.info("Started Client", clientID, "- To exit press CTRL+C")
         output.info("[i] To Subscribe to a place write   's {place}'")
@@ -67,8 +67,7 @@ open.then(connection => {
             if (message.content && routing_key.type == 'sensor') {
                 await saveData(message.content.toString())
                 output.info(message.fields.routingKey, "-", 'Saved Data to File')
-            }
-            else if (message.content && routing_key.type == 'earth.message') {
+            } else if (message.content && routing_key.type == 'earth.message') {
                 let payload = JSON.parse(message.content.toString())
                 let date = new Date(payload.timestamp)
 
@@ -85,13 +84,17 @@ open.then(connection => {
             let tmp = input.split(' ')
 
             switch (tmp[0]) {
-                case 's': subscribe_sensor(channel, q.queue, enduser_exch, tmp[1].toLocaleLowerCase())
+                case 's':
+                    subscribe_sensor(channel, q.queue, enduser_exch, tmp[1].toLocaleLowerCase())
                     break;
-                case 'd': desubscribe_sensor(channel, q.queue, enduser_exch, tmp[1].toLocaleLowerCase())
+                case 'd':
+                    desubscribe_sensor(channel, q.queue, enduser_exch, tmp[1].toLocaleLowerCase())
                     break;
-                case 'm': send_message(channel, comm_exch, tmp[1], tmp.slice(2).join(' '))
+                case 'm':
+                    send_message(channel, comm_exch, tmp[1], tmp.slice(2).join(' '))
                     break;
-                default: output.error('First Argument must be one of the following: s, d')
+                default:
+                    output.error('First Argument must be one of the following: s, d')
             }
         });
 
@@ -121,7 +124,7 @@ const saveData = (message) => fs.appendFile(
 const enduser_topics = (routing_key) => {
     let array = routing_key.split('.')
 
-    switch(array[0]){
+    switch (array[0]) {
         case 'sensor':
             // sensor data
             return {
@@ -131,19 +134,18 @@ const enduser_topics = (routing_key) => {
                 keys: array
             }
 
-        case 'earth':
-            // data from earth
-            return {
-                type: array[0] + '.' + array[1],
-                room: array[1],
-                status: array[2],
-                keys: array
-            }
+            case 'earth':
+                // data from earth
+                return {
+                    type: array[0] + '.' + array[1],
+                    address: array[2],
+                    keys: array
+                }
 
-        default:
-            return {
-                keys: array
-            }
+                default:
+                    return {
+                        keys: array
+                    }
     }
 }
 
@@ -190,7 +192,7 @@ const desubscribe_sensor = (channel, queue, exch, room) => {
  */
 const send_message = (channel, exch, address, text) => {
 
-    if(shortid.isValid(address)){
+    if (shortid.isValid(address)) {
         // create payload
         let payload = {
             timestamp: Date.now(),
@@ -206,8 +208,7 @@ const send_message = (channel, exch, address, text) => {
             Buffer.from(JSON.stringify(payload)))
 
         output.info(`✅ Send message to: ${address}`);
-    }
-    else{
+    } else {
         output.error(`The Address "${address}" doesn't seem to be corret`)
     }
 }
