@@ -22,7 +22,7 @@ shortid.characters('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWX
 
 // create process objects
 const clientID = shortid.generate()
-const output = logging.default('Client')
+const output = logging.default('Mars-Client')
 const open = amqp.connect(config.amqp.url)
 const rl = readline.createInterface({
     input: process.stdin,
@@ -49,7 +49,7 @@ open.then(connection => {
     await channel.assertQueue('', {
         exclusive: true
     }).then((q) => {
-        output.info("Started Client", clientID, "- To exit press CTRL+C")
+        output.info("Started Mars-Client", clientID, "- To exit press CTRL+C")
         output.info("[i] To Subscribe to a place write   's {place}'")
         output.info("[i] To Desubscribe to a place write 'd {place}'")
         output.info("[i] To Write a message write        'm {address} {message}'")

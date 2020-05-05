@@ -5,7 +5,7 @@
  */
 
 // config
-const config = require('../../_config/config.earth.json')
+const config = require('../_config/config.earth.json')
 
 // packages
 const amqp = require('amqplib')
@@ -18,7 +18,7 @@ shortid.characters('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWX
 
 // create process objects
 const clientID = shortid.generate()
-const output = logging.default('Client')
+const output = logging.default('Earth-Client')
 const open = amqp.connect(config.amqp.url)
 const rl = readline.createInterface({
     input: process.stdin,
@@ -39,11 +39,11 @@ open.then(connection => {
     await channel.assertQueue('', {
         exclusive: true
     }).then((q) => {
-        output.info("Started Client", clientID, "- To exit press CTRL+C")
+        output.info("Started Earth-Client", clientID, "- To exit press CTRL+C")
         output.info("[i] To Write a message write 'm {address} {message}'")
 
         // listen to messages from earth
-        channel.bindQueue(q.queue, comm_exch.exchange, clientID + 'normal')
+        channel.bindQueue(q.queue, comm_exch.exchange, clientID + '.normal')
 
         // consume
         channel.consume(q.queue, async message => {

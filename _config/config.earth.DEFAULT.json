@@ -1,12 +1,9 @@
 {
     "amqp": {
-        "host": "HOSTADRESS",
-        "user": "USER",
-        "password": "PWD",
         "url": "amqp://USER:PWD@HOSTADRESS/USER",
         "exch": {
-            "monitor": "monitor_log",
-            "enduser": "enduser",
+            "comm": "communication",
+            "apis": "api-monitor",
             "subs": "subscriptions"
         }
     }
