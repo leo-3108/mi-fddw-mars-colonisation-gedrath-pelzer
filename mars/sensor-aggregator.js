@@ -80,7 +80,7 @@ const sendToClients = async (channel, exch, topics) => {
 
         await channel.publish(
             exch,
-            `sensor.${topics.room}.${topics.status}`,
+            `sensor.${topics.room}.normal`,
             Buffer.from(JSON.stringify(
                 changeData(
                     bucket[topics.room].temperature,
