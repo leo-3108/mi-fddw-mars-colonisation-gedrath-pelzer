@@ -8,6 +8,7 @@
         "sensors": "node mars/sensors/temperatur.js labor1 & node mars/sensors/temperatur.js kitchen",
         "mars-client": "node mars/client/client.js",
         "earth-client": "node earth/client.js",
+        "earth-monitor": "node earth/internet-monitor/nasa-mars.js",
         "interfaces": "node mars/interface.js & node earth/interface.js"
     },
     "author": "",
