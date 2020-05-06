@@ -36,13 +36,31 @@ amqp.connect(config.amqp.url, function (error0, connection) {
 
             channel.bindQueue(q.queue, aggregator_exch, '#');
 
+            var data = [['labor', 'temperature', 0], ['labor', 'humidity', 0]]
+
+            const saveData = (room, sensortyp, value) => {
+                if (data[0][0] == room && data[0][1] == sensortyp) {
+                    data[0].pop()
+                    data[0].push(value)
+                }
+
+                if (data[1][0] == room && data[1][1] == sensortyp) {
+                    data[1].pop()
+                    data[1].push(value)
+                }
+
+
+            }
+
             channel.consume(q.queue, function (msg) {
                 output.info('Get data from ' + msg.fields.routingKey + ' - ' + msg.content);
+                msgtmp = msg.fields.routingKey.split('.')
 
-                //Anwendungslogik...
+                saveData(msgtmp[1], msgtmp[2], msg.content.toString())
 
-                senddata(msg.fields.routingKey, msg.content, channel, enduser_exch)
-
+                if (data[0][2] != 0 && data[1][2] != 0) {
+                    senddata(msg.fields.routingKey, data, channel, enduser_exch)
+                }
             }, {
                 noAck: true
             });
@@ -55,5 +73,6 @@ amqp.connect(config.amqp.url, function (error0, connection) {
 
         channel.publish(exchange, 'sensor' + '.' + keytmp[1] + '.normal', Buffer.from(content));
         output.info('Sent data - ' + 'sensor' + '.' + keytmp[1] + '.normal');
+        output.info(content)
     }
 })
