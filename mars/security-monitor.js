@@ -53,16 +53,14 @@ amqp.connect(config.amqp.url, function (error0, connection) {
                     if (msg.content <= config.sensors.temperature.min || msg.content >= config.sensors.temperature.max)
                         senderror(msg.fields.routingKey, msg.content, channel, enduser_exch)
 
-                    else
-                        senddata(msg.fields.routingKey, msg.content, channel, aggregator_exch)
+                    senddata(msg.fields.routingKey, msg.content, channel, aggregator_exch)
                 }
 
                 if (keytmp[2] == 'humidity') {
                     if (msg.content <= config.sensors.humidity.min || msg.content >= config.sensors.humidity.max)
                         senderror(msg.fields.routingKey, msg.content, channel, enduser_exch)
 
-                    else
-                        senddata(msg.fields.routingKey, msg.content, channel, aggregator_exch)
+                    senddata(msg.fields.routingKey, msg.content, channel, aggregator_exch)
                 }
 
             }, {

@@ -71,9 +71,9 @@ open.then(connection => {
 
             if (routing_key.type == 'sensor') {
                 if (routing_key.status = 'error'){
-                    output.warn('Kritischer Messwert aus Raum', routing_key.room, '->', payload)
+                    output.warn(routing_key , 'Kritischer Messwert aus Raum', routing_key.room, '->', payload)
                 }
-                else {
+                else if (routing_key.status = 'normal') {
                     await saveData(message.content.toString())
                     output.info(message.fields.routingKey, "-", 'Saved Data to File')
                 }

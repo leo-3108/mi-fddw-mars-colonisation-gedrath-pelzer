@@ -5,11 +5,13 @@
     "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "mars-sensor-temp": "node mars/sensors/temperature.js",
-        "mars-sensor-humi": "node mars/sensors/humidity.js",
-        "mars-sensors": "npm run mars-sensor-temp labor1 & npm run mars-sensor-temp kitchen & npm run mars-sensor-humi kitchen",
+        "temperatur": "node mars/sensors/temperature.js labor1 & node mars/sensors/temperature.js kitchen",
+        "humidity": "node mars/sensors/humidity.js labor1 & node mars/sensors/humidity.js kitchen",
+        "sensors": "npm run humidity & npm run temperatur",
         "mars-client": "node mars/client/client.js",
-        "mars-interface": "node mars/interface.js",
+        "mars-aggregator": "node mars/sensor-aggregator.js",
+        "mars-security": "node mars/security-monitor.js",
+        "mars-ecosystem": "npm run mars-aggregator & npm run mars-ecosystem",
         "earth-client": "node earth/client.js",
         "earth-interface": "node earth/interface.js"
     },
