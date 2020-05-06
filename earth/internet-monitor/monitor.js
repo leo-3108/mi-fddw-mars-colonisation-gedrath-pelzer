@@ -33,7 +33,7 @@ exports.start = (key = '', fetch_uri = (place) => '', fetch_options = (place) =>
 
     open.then(connection => {
         return connection.createChannel()
-    }).then(channel => {
+    }).then(async channel => {
 
         const api_exch = await channel.assertExchange(config.amqp.exch.apis, 'topic', {
             durable: false
@@ -43,7 +43,7 @@ exports.start = (key = '', fetch_uri = (place) => '', fetch_options = (place) =>
         setInterval(async () => {
 
             for (place of places) {
-                let pattern = place.name.toLowerCase()
+                let pattern = place.toLowerCase()
 
                 // Getting Data from API
                 await fetch(fetch_uri(place), fetch_options(place)).then(res => {
@@ -53,17 +53,17 @@ exports.start = (key = '', fetch_uri = (place) => '', fetch_options = (place) =>
                     } else {
                         // Convert to String
                         logger.warn("Failed fetching data from API through HTTP-Error-Code", res.status, res.statusText)
-                        channel.publish(exch.exchange, pattern + '.error', Buffer.from(`Failed fetching data from ${key}API through HTTP-Error-Code` + res.status))
+                        channel.publish(api_exch.exchange, pattern + '.error', Buffer.from(`Failed fetching data from ${key}API through HTTP-Error-Code` + res.status))
 
                         throw res
                     }
                 }).then(res => {
                     // Convert to String
-                    logger.info("Fetched data from", host, "-", place.name)
+                    logger.info("Fetched data from", host, "-", place)
                     return res.text()
                 }).then(text => {
                     // Send to Brocker
-                    if (channel.publish(exch.exchange, pattern + '.normal', Buffer.from(text)))
+                    if (channel.publish(api_exch.exchange, pattern + '.normal', Buffer.from(text)))
                         logger.info("Sent data to Brocker")
                     else
                         logger.error("Error accourd while sending data to Brocker")
