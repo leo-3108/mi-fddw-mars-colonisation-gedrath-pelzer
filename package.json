@@ -1,17 +1,38 @@
 {
     "name": "mi-fddw-mars-colonisation-gedrath-pelzer",
     "version": "1.0.0",
-    "description": "2. Meilenstein, FDDW SoSe2020",
+    "description": "Projekt im Kurs „Frameworks, Dienste und Daten im Web” (FDDW) im Schwerpunktmodel Web-Development im Studiengang Medieninformatik (Ba.) an der TH Köln (SS 2020) – 2. Meilenstein",
     "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "sensors": "node mars/sensors/temperatur.js labor1 & node mars/sensors/temperatur.js kitchen",
+        "mars-sensor-temp": "node mars/sensors/temperatur.js",
+        "mars-sensor-humi": "node mars/sensors/humidity.js",
+        "mars-sensors": "npm run sensor-temp labor1 & npm run sensor-temp kitchen & npm run sensor-humi kitchen",
         "mars-client": "node mars/client/client.js",
+        "mars-interface": "node mars/interface.js",
         "earth-client": "node earth/client.js",
-        "interfaces": "node mars/interface.js & node earth/interface.js"
+        "earth-interface": "node earth/interface.js"
     },
-    "author": "",
-    "license": "ISC",
+    "authors": [
+        {
+            "name": "Finn Nils Gedrath",
+            "email": "fgedrath@th-koeln.de"
+        },
+        {
+            "name": "Leonard Pelzer",
+            "email": "lpelzer1@th-koeln.de"
+        }
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/leo-3108/mi-fddw-mars-colonisation-gedrath-pelzer.git",
+        "directory": "leo-3108/mi-fddw-mars-colonisation-gedrath-pelzer"
+    },
+    "bugs": {
+        "url": "https://github.com/leo-3108/mi-fddw-mars-colonisation-gedrath-pelzer/issues"
+    },
+    "homepage": "https://github.com/leo-3108/mi-fddw-mars-colonisation-gedrath-pelzer#readme",
+    "license": "MIT",
     "dependencies": {
         "amqplib": "^0.5.5",
         "logging": "^3.2.0",
