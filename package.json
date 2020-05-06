@@ -12,7 +12,7 @@
         "mars-ecosystem": "npm run mars-aggregator & npm run mars-ecosystem",
         "earth-client": "node earth/client.js",
         "interfaces": "node mars/interface.js & node earth/interface.js"
-    }
+    },
     "author": "",
     "license": "ISC",
     "dependencies": {
