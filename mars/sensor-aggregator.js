@@ -36,19 +36,17 @@ amqp.connect(config.amqp.url, function (error0, connection) {
 
             channel.bindQueue(q.queue, aggregator_exch, '#');
 
-            var data = [['labor', 'temperature', 0], ['labor', 'humidity', 0]]
+            var data = []
 
             const saveData = (room, sensortyp, value) => {
-                if (data[0][0] == room && data[0][1] == sensortyp) {
-                    data[0].pop()
-                    data[0].push(value)
-                }
 
-                if (data[1][0] == room && data[1][1] == sensortyp) {
-                    data[1].pop()
-                    data[1].push(value)
+                var tmp = data.findIndex(element => element.room == room && element.sensortyp == sensortyp)
+                if (tmp != -1) {
+                    data[tmp].value = value
                 }
-
+                else {
+                    data.push({ room, sensortyp, value })
+                }
 
             }
 
@@ -58,16 +56,20 @@ amqp.connect(config.amqp.url, function (error0, connection) {
 
                 saveData(msgtmp[1], msgtmp[2], msg.content.toString())
 
-                if (data[0][2] != 0 && data[1][2] != 0) {
-                    senddata(msg.fields.routingKey, data, channel, enduser_exch)
-                }
+                sendData(msg.fields.routingKey, data, channel, enduser_exch)
+                //output.info(data)
+
+                let dataMap = new Map(data)
+                dataMap.get()
+
+
             }, {
                 noAck: true
             });
         });
     });
 
-    function senddata(key, content, channel, exchange) {
+    function sendData(key, content, channel, exchange) {
         //Code zum Senden der Daten
         var keytmp = key.split('.')
 
