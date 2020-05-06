@@ -26,7 +26,6 @@ earth.then(connection => {
     return connection.createChannel()
 }).then(async channel => {
 
-    // incoming messages
     const earth_comm_exch = await channel.assertExchange(config_earth.amqp.exch.comm, 'topic', {
         durable: false
     })

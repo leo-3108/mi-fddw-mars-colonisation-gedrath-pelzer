@@ -35,6 +35,11 @@ open.then(connection => {
         durable: false
     })
 
+    // receiving messages
+    const enduser_exch = await channel.assertExchange(config.amqp.exch.enduser, 'topic', {
+        durable: false
+    })
+
     // establish own queue
     await channel.assertQueue('', {
         exclusive: true
@@ -42,8 +47,8 @@ open.then(connection => {
         output.info("Started Earth-Client", clientID, "- To exit press CTRL+C")
         output.info("[i] To Write a message write 'm {address} {message}'")
 
-        // listen to messages from earth
-        channel.bindQueue(q.queue, comm_exch.exchange, clientID + '.normal')
+        // listen to messages from mars
+        channel.bindQueue(q.queue, enduser_exch.exchange, clientID + '.normal')
 
         // consume
         channel.consume(q.queue, async message => {

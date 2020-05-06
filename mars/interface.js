@@ -53,11 +53,11 @@ mars.then(connection => {
                     return earth_connection.createChannel()
                 }).then(async earth_channel => {
 
-                    const earth_comm_exch = await channel.assertExchange(config_earth.amqp.exch.comm, 'topic', {
+                    const earth_enduser_exch = await channel.assertExchange(config_earth.amqp.exch.enduser, 'topic', {
                         durable: false
                     })
 
-                    if (earth_channel.publish(earth_comm_exch.exchange, message.fields.routingKey, message.content))
+                    if (earth_channel.publish(earth_enduser_exch.exchange, message.fields.routingKey, message.content))
                         output.info("✅ Sent data to Earth 🌍 from " + message.fields.exchange)
                     else
                         output.error("Error accourd while sending data to Earth")

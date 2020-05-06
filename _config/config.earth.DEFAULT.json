@@ -4,7 +4,8 @@
         "exch": {
             "comm": "communication",
             "apis": "api-monitor",
-            "subs": "subscriptions"
+            "subs": "subscriptions",
+            "enduser": "enduser"
         }
     }
 }
