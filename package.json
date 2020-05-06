@@ -5,7 +5,9 @@
     "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "sensors": "node mars/sensors/temperature.js labor1 & node mars/sensors/temperature.js kitchen",
+        "temperatur": "node mars/sensors/temperature.js labor1 & node mars/sensors/temperature.js kitchen",
+        "humidity": "node mars/sensors/humidity.js labor1 & node mars/sensors/humidity.js kitchen",
+        "sensors": "npm run humidity & npm run temperatur",
         "mars-client": "node mars/client/client.js",
         "mars-aggregator": "node mars/sensor-aggregator.js",
         "mars-security": "node mars/security-monitor.js",
