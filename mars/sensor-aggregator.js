@@ -62,8 +62,7 @@ amqp.connect(config.amqp.url, function (error0, connection) {
                 labor.push(data.find(element => element.room == 'labor' && element.sensortyp == 'humidity'))
                 labor.push(data.find(element => element.room == 'labor' && element.sensortyp == 'temperature'))
 
-                if (labor.find(element => element == 'undefined') == -1)
-                    sendData(msg.fields.routingKey, labor, channel, enduser_exch)
+                sendData(msg.fields.routingKey, labor, channel, enduser_exch)
 
             }, {
                 noAck: true
