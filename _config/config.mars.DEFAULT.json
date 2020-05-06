@@ -2,11 +2,21 @@
     "amqp": {
         "url": "amqp://USER:PWD@HOSTADRESS/USER",
         "exch": {
-            "sensor": "sensoren",
+            "sensor": "sensor",
             "aggregator": "aggregator",
             "enduser": "enduser",
             "subs": "subscription",
             "comm": "communication"
+        }
+    },
+    "sensors": {
+        "temperature": {
+            "min": "minvalue",
+            "max": "maxvalue"
+        },
+        "humidity": {
+            "min": "minvalue",
+            "max": "maxvalue"
         }
     }
 }
