@@ -4,12 +4,18 @@
     "description": "2. Meilenstein, FDDW SoSe2020",
     "main": "index.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "sensors": "node mars/sensors/temperatur.js labor1 & node mars/sensors/temperatur.js kitchen",
+        "mars-client": "node mars/client/client.js",
+        "earth-client": "node earth/client.js",
+        "interfaces": "node mars/interface.js & node earth/interface.js"
     },
     "author": "",
     "license": "ISC",
     "dependencies": {
         "amqplib": "^0.5.5",
-        "node-fetch": "^2.6.0"
+        "logging": "^3.2.0",
+        "readline": "^1.3.0",
+        "shortid": "^2.2.15"
     }
 }

@@ -1,13 +1,22 @@
 {
     "amqp": {
-        "host": "HOSTADRESS",
-        "user": "USER",
-        "password": "PWD",
         "url": "amqp://USER:PWD@HOSTADRESS/USER",
         "exch": {
-            "monitor": "monitor_log",
+            "sensor": "sensor",
+            "aggregator": "aggregator",
             "enduser": "enduser",
-            "subs": "subscriptions"
+            "subs": "subscription",
+            "comm": "communication"
+        }
+    },
+    "sensors": {
+        "temperature": {
+            "min": "minvalue",
+            "max": "maxvalue"
+        },
+        "humidity": {
+            "min": "minvalue",
+            "max": "maxvalue"
         }
     }
 }
