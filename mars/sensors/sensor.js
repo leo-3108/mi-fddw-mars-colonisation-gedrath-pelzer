@@ -5,7 +5,7 @@ var config = require('../../_config/config.mars.json')
 const amqplib = require('amqplib')
 const logging = require('logging')
 
-exports.start = (getdata, room, type, id, interval = 3) => {
+exports.start = (getdata, room, type, id, interval = 10) => {
 
     const output = logging.default(type + '.' + room + '.normal')
 
