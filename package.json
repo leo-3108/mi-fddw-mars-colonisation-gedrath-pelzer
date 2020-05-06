@@ -5,10 +5,10 @@
     "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "sensors": "node mars/sensors/temperatur.js labor1 & node mars/sensors/temperatur.js kitchen",
+        "sensors": "node mars/sensors/temperature.js labor1 & node mars/sensors/temperature.js kitchen",
         "mars-client": "node mars/client/client.js",
-        "mars-aggregator": "node mars/client/sensor-aggregator.js",
-        "mars-security": "node mars/client/security-monitor.js",
+        "mars-aggregator": "node mars/sensor-aggregator.js",
+        "mars-security": "node mars/security-monitor.js",
         "mars-ecosystem": "npm run mars-aggregator & npm run mars-ecosystem"
     },
     "author": "",
