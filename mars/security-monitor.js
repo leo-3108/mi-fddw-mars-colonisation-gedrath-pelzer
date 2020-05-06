@@ -6,6 +6,8 @@ const output = logging.default('Security-Monitor')
 const okay = logging.default('🟢')
 const error = logging.default('🔴')
 
+output.info('Waiting for data - To exit press CTRL+C')
+
 amqp.connect(config.amqp.url, function (error0, connection) {
     if (error0) {
         throw error0;
@@ -45,12 +47,24 @@ amqp.connect(config.amqp.url, function (error0, connection) {
             channel.consume(q.queue, function (msg) {
                 output.info('Get data from ' + msg.fields.routingKey + ' - ' + msg.content);
 
-                if (msg.content <= 20.5 || msg.content >= 24.5) {
-                    senderror(msg.fields.routingKey, msg.content, channel, enduser_exch)
+                var keytmp = msg.fields.routingKey.split('.')
+
+                if (keytmp[2] == 'temperature') {
+                    if (msg.content <= config.sensors.temperature.min || msg.content >= config.sensors.temperature.max)
+                        senderror(msg.fields.routingKey, msg.content, channel, enduser_exch)
+
+                    else
+                        senddata(msg.fields.routingKey, msg.content, channel, aggregator_exch)
                 }
-                else {
-                    senddata(msg.fields.routingKey, msg.content, channel, aggregator_exch)
+
+                if (keytmp[2] == 'humidity') {
+                    if (msg.content <= config.sensors.humidity.min || msg.content >= config.sensors.humidity.max)
+                        senderror(msg.fields.routingKey, msg.content, channel, enduser_exch)
+
+                    else
+                        senddata(msg.fields.routingKey, msg.content, channel, aggregator_exch)
                 }
+
             }, {
                 noAck: true
             });
@@ -59,10 +73,9 @@ amqp.connect(config.amqp.url, function (error0, connection) {
 
     function senddata(key, content, channel, exchange) {
         //Code zum weiterleiten
-        var keytmp = key.split('.')
 
-        channel.publish(exchange, 'sensor' + '.' + keytmp[1] + '.normal', Buffer.from(content));
-        okay.info('Sent data - ' + 'sensor' + '.' + keytmp[1] + '.normal');
+        channel.publish(exchange, key, Buffer.from(content));
+        okay.info('Sent data - ' + key);
     }
 
     function senderror(key, content, channel, exchange) {

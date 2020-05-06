@@ -1,5 +1,8 @@
 var amqp = require('amqplib/callback_api');
 var config = require('../_config/config.mars.json')
+const logging = require('logging')
+
+const output = logging.default('Aggregator')
 
 amqp.connect(config.amqp.url, function (error0, connection) {
     if (error0) {
@@ -10,14 +13,15 @@ amqp.connect(config.amqp.url, function (error0, connection) {
             throw error1;
         }
 
-        //Empfangen der Daten
-        var exchange1 = 'checked-data';
-        channel.assertExchange(exchange1, 'topic', {
+        //Daten empfangen
+        var aggregator_exch = config.amqp.exch.aggregator;
+        channel.assertExchange(aggregator_exch, 'topic', {
             durable: false
         });
 
-        // Weiterleiten der Daten
-        const enduser_exch = channel.assertExchange(config.amqp.exch.enduser, 'topic', {
+        //Daten senden
+        var enduser_exch = config.amqp.exch.enduser;
+        channel.assertExchange(enduser_exch, 'topic', {
             durable: false
         });
 
@@ -27,16 +31,51 @@ amqp.connect(config.amqp.url, function (error0, connection) {
             if (error2) {
                 throw error2;
             }
-            console.log(' [*] Waiting for data. To exit press CTRL+C');
 
-            channel.bindQueue(q.queue, enduser_exch.exchange, '#');
+            output.info('Waiting for data - To exit press CTRL+C')
+
+            channel.bindQueue(q.queue, aggregator_exch, '#');
+
+            var data = []
+
+            const saveData = (room, sensortyp, value) => {
+
+                var tmp = data.findIndex(element => element.room == room && element.sensortyp == sensortyp)
+                if (tmp != -1) {
+                    data[tmp].value = value
+                }
+                else {
+                    data.push({ room, sensortyp, value })
+                }
+
+            }
 
             channel.consume(q.queue, function (msg) {
-                console.log(" [x] Get data from " + msg.fields.routingKey);
-                //Anwendungslogik
+                output.info('Get data from ' + msg.fields.routingKey + ' - ' + msg.content);
+                msgtmp = msg.fields.routingKey.split('.')
+
+                saveData(msgtmp[1], msgtmp[2], msg.content.toString())
+
+                //output.info(data)
+
+                var labor = []
+                labor.push(data.find(element => element.room == 'labor' && element.sensortyp == 'humidity'))
+                labor.push(data.find(element => element.room == 'labor' && element.sensortyp == 'temperature'))
+
+                sendData(msg.fields.routingKey, labor, channel, enduser_exch)
+
             }, {
                 noAck: true
             });
         });
     });
+
+    function sendData(key, content, channel, exchange) {
+        //Code zum Senden der Daten
+        var keytmp = key.split('.')
+
+        channel.publish(exchange, 'sensor' + '.' + keytmp[1] + '.normal', Buffer.from(content));
+        output.info('Sent data - ' + 'sensor' + '.' + keytmp[1] + '.normal');
+        output.info(content)
+    }
 })

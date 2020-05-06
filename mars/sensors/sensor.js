@@ -5,7 +5,7 @@ var config = require('../../_config/config.mars.json')
 const amqplib = require('amqplib')
 const logging = require('logging')
 
-exports.start = (getdata, room, type, id, interval = 3) => {
+exports.start = (getdata, room, type, id, interval = 10) => {
 
     const output = logging.default(type + '.' + room + '.normal')
 
@@ -24,7 +24,7 @@ exports.start = (getdata, room, type, id, interval = 3) => {
             // Start sending the request every $interval seconds
             setInterval(async () => {
                 let data = getdata().toString()
-                if (channel.publish(exch.exchange, type + '.' + room + '.normal', Buffer.from(data)))
+                if (channel.publish(exch.exchange, 'sensor.' + room + '.' + type + '.normal', Buffer.from(data)))
                     output.info("✅ Sent Sensor data to Brocker – " + data)
                 else
                     output.error("Error accourd while sending data to Brocker")
