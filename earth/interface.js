@@ -7,7 +7,7 @@
 
 // config
 const config_mars = require('../_config/config.mars.json')
-const config_earth = require('../_config/config.mars.json')
+const config_earth = require('../_config/config.earth.json')
 
 // packages
 const amqp = require('amqplib')
@@ -31,6 +31,9 @@ earth.then(connection => {
         durable: false
     })
 
+    // TODO: API Monitor
+    //const earth_api_exch
+
     // establish own queue
     await channel.assertQueue('', {
         exclusive: true
@@ -43,21 +46,31 @@ earth.then(connection => {
         // consume
         channel.consume(q.queue, message => {
 
-            output.info('Message Received – Wait for 3 Secs')
+            output.info('Message Received – Wait for 3 Secs', message.fields.exchange)
 
             // waiting simulates the travel time from earth to mars
-            setTimeoutPromise(60 * 3).then(async () => {
+            setTimeoutPromise(1000 * 3).then(async () => {
 
                 // connect to mars
                 await mars.then(mars_connection => {
                     return mars_connection.createChannel()
                 }).then(async mars_channel => {
 
-                    const mars_comm_exch = await channel.assertExchange(config_mars.amqp.exch.comm, 'topic', {
+                    const mars_enduser_exch = await channel.assertExchange(config_mars.amqp.exch.enduser, 'topic', {
                         durable: false
                     })
 
-                    if (mars_channel.publish(mars_comm_exch.exchange, message.fields.routingKey, message.content))
+                    let routingKey = earth_comm_topics(message.fields.routingKey)
+                    let new_routingKey = message.fields.routingKey
+
+                    // Change Routing Key akkording to type
+                    if (message.fields.exchange == earth_comm_exch.exchange){
+                        new_routingKey = `earth.message.${routingKey.address}`
+                    }
+                    //else if(message.fields.exchange == earth_api_exch.exchange){}
+
+                    // send message
+                    if (mars_channel.publish(mars_enduser_exch.exchange, new_routingKey, message.content))
                         output.info("✅ Sent data to Mars 👽 from " + message.fields.exchange)
                     else
                         output.error("Error accourd while sending data to Brocker")
@@ -75,3 +88,19 @@ earth.then(connection => {
 }).catch(err => {
     throw err
 })
+
+/**
+ * Wandelt die Topics aus dem Enduser exchange um
+ * @param {String} routing_key Topic der Nachricht
+ * 
+ * @return {Object} Jedes Attribut der Nachricht ist ein Topic 
+ */
+const earth_comm_topics = (routing_key) => {
+    let array = routing_key.split('.')
+
+    return {
+        address: array[0],
+        status: array[0],
+        keys: array
+    }
+}

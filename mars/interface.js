@@ -7,7 +7,7 @@
 
 // config
 const config_mars = require('../_config/config.mars.json')
-const config_earth = require('../_config/config.mars.json')
+const config_earth = require('../_config/config.earth.json')
 
 // packages
 const amqp = require('amqplib')
@@ -46,7 +46,7 @@ mars.then(connection => {
             output.info('Message Received – Wait for 3 Secs')
 
             // waiting simulates the travel time from mars to earth
-            setTimeoutPromise(60 * 3).then(async () => {
+            setTimeoutPromise(1000 * 3).then(async () => {
 
                 // connect to earth
                 await earth.then(earth_connection => {
@@ -60,7 +60,7 @@ mars.then(connection => {
                     if (earth_channel.publish(earth_comm_exch.exchange, message.fields.routingKey, message.content))
                         output.info("✅ Sent data to Earth 🌍 from " + message.fields.exchange)
                     else
-                        output.error("Error accourd while sending data to Brocker")
+                        output.error("Error accourd while sending data to Earth")
 
 
                 }).catch(err => {

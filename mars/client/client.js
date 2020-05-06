@@ -58,7 +58,7 @@ open.then(connection => {
         channel.bindQueue(q.queue, enduser_exch.exchange, 'sensor.#.error');
 
         // listen to messages from earth
-        channel.bindQueue(q.queue, comm_exch.exchange, 'earth.message.' + clientID);
+        channel.bindQueue(q.queue, enduser_exch.exchange, 'earth.message.' + clientID);
 
         // consume
         channel.consume(q.queue, async message => {
@@ -94,7 +94,7 @@ open.then(connection => {
                     send_message(channel, comm_exch, tmp[1], tmp.slice(2).join(' '))
                     break;
                 default:
-                    output.error('First Argument must be one of the following: s, d')
+                    output.error('First Argument must be one of the following: s, d, m')
             }
         });
 
