@@ -64,10 +64,20 @@ open.then(connection => {
         channel.consume(q.queue, async message => {
             let routing_key = enduser_topics(message.fields.routingKey)
 
-            if (message.content && routing_key.type == 'sensor') {
-                await saveData(message.content.toString())
-                output.info(message.fields.routingKey, "-", 'Saved Data to File')
-            } else if (message.content && routing_key.type == 'earth.message') {
+            if (!message.content)
+                return
+
+            let payload = message.content.toString()
+
+            if (routing_key.type == 'sensor') {
+                if (routing_key.status = 'error'){
+                    output.warn('Kritischer Messwert aus Raum', routing_key.room, '->', payload)
+                }
+                else {
+                    await saveData(message.content.toString())
+                    output.info(message.fields.routingKey, "-", 'Saved Data to File')
+                }
+            } else if (routing_key.type == 'earth.message') {
                 let payload = JSON.parse(message.content.toString())
                 let date = new Date(payload.timestamp)
 
@@ -134,18 +144,18 @@ const enduser_topics = (routing_key) => {
                 keys: array
             }
 
-            case 'earth':
-                // data from earth
-                return {
-                    type: array[0] + '.' + array[1],
-                    address: array[2],
-                    keys: array
-                }
+        case 'earth':
+            // data from earth
+            return {
+                type: array[0] + '.' + array[1],
+                address: array[2],
+                keys: array
+            }
 
-                default:
-                    return {
-                        keys: array
-                    }
+        default:
+            return {
+                keys: array
+            }
     }
 }
 
