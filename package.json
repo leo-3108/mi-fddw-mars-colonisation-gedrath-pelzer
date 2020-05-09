@@ -22,7 +22,7 @@
 
         "//": "Predefined",
         "pre:sensors": "npm run mars:sensor:hum labor1 & npm run npm run mars:sensor:hum kitchen & npm run mars:sensor:temp labor1 & npm run npm run mars:sensor:temp kitchen",
-        "pre:mars": "npm run mars:security & npm run mars:aggr:sensor & npm run mars:aggr:api & mars:interface",
+        "pre:mars": "npm run mars:security & npm run mars:aggr:sensor & npm run mars:aggr:api & npm run mars:interface",
         "pre:earth": "npm run earth:api:nasa & npm run earth:interface"
     },
     "authors": [
