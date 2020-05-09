@@ -39,9 +39,7 @@ exports.start = (key = '', fetch_uri = (place) => '', fetch_options = (place) =>
             durable: false
         })
 
-        // Start sending the request every $interval seconds
-        setInterval(async () => {
-
+        const request = async () => {
             for (place of places) {
                 let pattern = place.toLowerCase()
 
@@ -72,10 +70,16 @@ exports.start = (key = '', fetch_uri = (place) => '', fetch_options = (place) =>
                     logger.error("Error accourd while fetching data: ", err)
                 })
             }
+        }
 
+        // Start sending the request every $interval seconds
+        await request()
+        setInterval(async () => {
+            await request()
         }, interval * 1000)
 
     }).catch(err => {
         throw err
     })
 }
+

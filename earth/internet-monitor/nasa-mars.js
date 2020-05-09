@@ -8,5 +8,6 @@ monitor(
     config.apis.nasa.host,
     [
         'mars'
-    ]
+    ],
+    60 * 60 * 12
 )
