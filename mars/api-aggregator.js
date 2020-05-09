@@ -41,16 +41,19 @@ open.then(connection => {
         output.info("Started API-Aggregator - To exit press CTRL+C")
 
         // listen everything with critical info
-        channel.bindQueue(q.queue, enduser_exch.exchange, '#.normal');
+        channel.bindQueue(q.queue, api_aggr_exch.exchange, '#.normal');
 
         // consume
         channel.consume(q.queue, async message => {
-            let routing_key = enduser_topics(message.fields.routingKey)
 
             if (!message.content)
                 return
 
             let payload = JSON.parse(message.content.toString())
+
+            channel.publish(enduser_exch.exchange, message.fields.routingKey, Buffer.from(
+                JSON.stringify(NASA_Insight(payload))
+            ))
 
         }, {
             // automatic acknowledgment mode,
@@ -65,3 +68,36 @@ open.then(connection => {
 }).catch(err => {
     throw err
 })
+
+/**
+ * Weather Forecast for the next 3 days
+ * 
+ * Converts the NASA API into readable Text for the User
+ * TRICK: The Data is seen as Weather-Forecast not as the current weather
+ * 
+ * @param {Object} paylpoad JSON-Object that comes from Earth
+ */
+const NASA_Insight = (paylpoad) => {
+    let output = {
+        title: "Weather-Report",
+        data: []
+    }
+
+    let sol_days = paylpad.sol_keys
+
+    // get the first three dates
+    for (let i = 0; i < 3; i++) {
+        output.data[i] = {
+            date: sol_days[i],
+            dateUTC: paylpoad[sol_days[i]].First_UTC,
+            season: paylpoad[sol_days[i]].Season,
+            temp_high: paylpoad[sol_days[i]].AT.mx,
+            temp_low: paylpoad[sol_days[i]].AT.mn,
+            wind: paylpoad[sol_days[i]].HWS.av,
+            pressure: paylpoad[sol_days[i]].PRE.av,
+        }
+        
+    }
+
+    return output
+}
