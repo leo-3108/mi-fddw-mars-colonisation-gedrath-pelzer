@@ -27,59 +27,77 @@ Eine Analyse des Problemraums und ein Modell der Architektur sind im [Wiki](http
 
 Bevor das System gestartet werden kann, müssen die `config.earth.json` und die `config.mars.json` mit den AMQP Zugangs-Daten befüllt werden. Auch müssen weitere Einstellungen befüllt werden.
 
-Jede Komponente von den anderen unabhängig und muss einzelnd gestartet werden.
+Jede Komponente ist von den anderen unabhängig und muss einzelnd gestartet werden.
 
 ### Mars-Ecosystem
 ```bash
- $ npm run mars-ecosystem
+ $ npm run pre:mars
 ```
 Dies startet alle Scripte, die zur Weiterleitung und Verarbeitungen von Daten auf dem Mars benötigt werde.
 
 **Alternativ** können hier für auch diese folgenden Scripte gestartet werden:
 
 ```bash
- $ npm run 
+ $ npm run mars:security
 ```
 
 ```bash
- $ npm run earth-interface
+ $ npm run mars:aggr:sensor
+```
+
+```bash
+ $ npm run mars:aggr:api
+```
+
+```bash
+ $ npm run mars:interface
 ```
 
 ### Mars-Sensoren
 Vordefinierte Sensoren:
 
 ```bash
- $ npm run mars-sensors
+ $ npm run pre:sensors
 ```
 
 Temperatur-Sensor:
 
 ```bash
- $ npm run mars-sensor-temp {roomName}
+ $ npm run mars:sensor:temp {roomName}
+```
+
+Luftfeuchtigkeits-Sensor:
+
+```bash
+ $ npm run mars:sensor:hum {roomName}
 ```
 
 ### Earth-Ecosystem
 ```bash
- $ npm run earth-ecosystem
+ $ npm run pre:earth
 ```
 Dies startet alle Scripte, die zur Weiterleitung und Verarbeitungen von Daten auf der Erde benötigt werde.
 
 **Alternativ** können hier für auch diese folgenden Scripte gestartet werden:
 
 ```bash
- $ npm run earth-interface
+ $ npm run earth:interface
+```
+
+```bash
+ $ npm run earth:api:nasa
 ```
 
 ### Clients
 
 Client auf dem Mars:
 ```bash
- $ npm run mars-client
+ $ npm run mars:client
 ```
 
 Client auf der Erde:
 ```bash
- $ npm run earth-client
+ $ npm run earth:client
 ```
 
 Jeder Client hat eine eindeutige 6 stellige ClientID, die zur Kommunikation verwendet wird.
