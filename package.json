@@ -13,6 +13,8 @@
         "mars-security": "node mars/security-monitor.js",
         "mars-ecosystem": "npm run mars-aggregator & npm run mars-ecosystem",
         "earth-client": "node earth/client.js",
+        "earth-monitor": "node earth/internet-monitor/nasa-mars.js",
+        "interfaces": "node mars/interface.js & node earth/interface.js",
         "earth-interface": "node earth/interface.js"
     },
     "authors": [
@@ -38,6 +40,7 @@
     "dependencies": {
         "amqplib": "^0.5.5",
         "logging": "^3.2.0",
+        "node-fetch": "^2.6.0",
         "readline": "^1.3.0",
         "shortid": "^2.2.15"
     }

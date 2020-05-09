@@ -30,8 +30,9 @@ earth.then(connection => {
         durable: false
     })
 
-    // TODO: API Monitor
-    //const earth_api_exch
+    const earth_api_exch = await channel.assertExchange(config_earth.amqp.exch.apis, 'topic', {
+        durable: false
+    })
 
     // establish own queue
     await channel.assertQueue('', {
@@ -41,6 +42,9 @@ earth.then(connection => {
 
         // listen to communication exchange
         channel.bindQueue(q.queue, earth_comm_exch.exchange, '#.normal')
+
+        // listen to api exchange
+        channel.bindQueue(q.queue, earth_api_exch.exchange, '#.normal')
 
         // consume
         channel.consume(q.queue, message => {
@@ -66,7 +70,9 @@ earth.then(connection => {
                     if (message.fields.exchange == earth_comm_exch.exchange){
                         new_routingKey = `earth.message.${routingKey.address}`
                     }
-                    //else if(message.fields.exchange == earth_api_exch.exchange){}
+                    else if (message.fields.exchange == earth_api_exch.exchange) {
+                        new_routingKey = `sensor.${routingKey.address}.normal`
+                    }
 
                     // send message
                     if (mars_channel.publish(mars_enduser_exch.exchange, new_routingKey, message.content))
