@@ -4,6 +4,8 @@ const logging = require('logging')
 
 const output = logging.default('Aggregator')
 
+var bucket = {}
+
 amqp.connect(config.amqp.url, function (error0, connection) {
     if (error0) {
         throw error0;
@@ -36,47 +38,106 @@ amqp.connect(config.amqp.url, function (error0, connection) {
 
             channel.bindQueue(q.queue, aggregator_exch, '#');
 
-            var data = []
+            // Get Data
+            channel.consume(q.queue, async (message) => {
+                output.info('Get data from ' + message.fields.routingKey + ' - ' + message.content);
+                
+                let topics = sensor_topics(message.fields.routingKey)
 
-            const saveData = (room, sensortyp, value) => {
-
-                var tmp = data.findIndex(element => element.room == room && element.sensortyp == sensortyp)
-                if (tmp != -1) {
-                    data[tmp].value = value
+                if (bucket[topics.room] == null) {
+                    bucket[topics.room] = {
+                        temperature: null,
+                        humidity: null
+                    }
                 }
-                else {
-                    data.push({ room, sensortyp, value })
-                }
 
-            }
+                bucket[topics.room][topics.type] = JSON.parse(message.content.toString())
 
-            channel.consume(q.queue, function (msg) {
-                output.info('Get data from ' + msg.fields.routingKey + ' - ' + msg.content);
-                msgtmp = msg.fields.routingKey.split('.')
-
-                saveData(msgtmp[1], msgtmp[2], msg.content.toString())
-
-                //output.info(data)
-
-                var labor = []
-                labor.push(data.find(element => element.room == 'labor' && element.sensortyp == 'humidity'))
-                labor.push(data.find(element => element.room == 'labor' && element.sensortyp == 'temperature'))
-
-                if (labor.find(element => element == 'undefined') == -1)
-                    sendData(msg.fields.routingKey, labor, channel, enduser_exch)
+                await sendToClients(channel, enduser_exch, topics).catch(err => {
+                    output.error('@sendToClients', err)
+                })
 
             }, {
                 noAck: true
             });
         });
     });
-
-    function sendData(key, content, channel, exchange) {
-        //Code zum Senden der Daten
-        var keytmp = key.split('.')
-
-        channel.publish(exchange, 'sensor' + '.' + keytmp[1] + '.normal', Buffer.from(content));
-        output.info('Sent data - ' + 'sensor' + '.' + keytmp[1] + '.normal');
-        output.info(content)
-    }
 })
+
+/**
+ * Sendet die veränderten Daten gesammelt zu allen Clients, wenn alle
+ * Monitore ihren Daten zu einem Ort versendet haben
+ *
+ * @module distributer
+ * @version 1.0
+ * 
+ * @param {Channel} channel 
+ * @param {AssertExchange} exch 
+ * @param {Object} topics Orignial Topics 
+ */
+const sendToClients = async (channel, exch, topics) => {
+    if (bucket[topics.room].temperature != null && bucket[topics.room].humidity != null) {
+
+        await channel.publish(
+            exch,
+            `sensor.${topics.room}.normal`,
+            Buffer.from(JSON.stringify(
+                changeData(
+                    bucket[topics.room].temperature,
+                    bucket[topics.room].humidity,
+                    topics.room
+                )
+            ))
+        )
+
+        output.info("✅ Send new message to Enduser")
+        delete bucket[topics.room]
+
+    } else {
+        output.warn("Not enough data to send to Enduser", bucket)
+        return
+    }
+}
+
+/**
+ * Verändert die Daten entsprechend der Anwendungslogik
+ * 
+ * @module distributer
+ * @version 1.0
+ * 
+ * @param {Object} humidity Luftfeuchtigkeits-Sensor
+ * @param {Object} temperature Temperatur-Sensor
+ * 
+ * @return {Object} Verändertes Object
+ */
+const changeData = (humidity, temperature, room) => {
+    output.info("Changed Data")
+    return {
+        "meta": {
+            "info": "Ihre Sensor-Daten für Raum " + room
+        },
+        "humidity": humidity,
+        "temperatur": temperature
+    }
+}
+
+/**
+ * Spaltet die Monitoring-Topics in ihre entsprechende Wörter
+ * 
+ * @module distributer
+ * @version 0.1
+ * 
+ * @param {Object} routing_key Verwendete Topics der Nachricht 
+ *  
+ * @return {Object} Wörter aufgespaltet in `type`, `place`, `status`
+ */
+const sensor_topics = (routing_key) => {
+    let array = routing_key.split('.')
+
+    return {
+        from: array[0],
+        room: array[1],
+        type: array[2],
+        status: array[3]
+    }
+}

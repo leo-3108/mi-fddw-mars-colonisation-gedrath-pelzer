@@ -70,10 +70,9 @@ open.then(connection => {
             let payload = message.content.toString()
 
             if (routing_key.type == 'sensor') {
-                if (routing_key.status = 'error'){
+                if (routing_key.status == 'error') {
                     output.warn('Kritischer Messwert aus Raum', routing_key.room, '->', payload)
-                }
-                else {
+                } else if (routing_key.status == 'normal') {
                     await saveData(message.content.toString())
                     output.info(message.fields.routingKey, "-", 'Saved Data to File')
                 }
@@ -139,23 +138,23 @@ const enduser_topics = (routing_key) => {
             // sensor data
             return {
                 type: array[0],
-                room: array[1],
-                status: array[2],
-                keys: array
+                    room: array[1],
+                    status: array[2],
+                    keys: array
             }
 
-        case 'earth':
-            // data from earth
-            return {
-                type: array[0] + '.' + array[1],
-                address: array[2],
-                keys: array
-            }
+            case 'earth':
+                // data from earth
+                return {
+                    type: array[0] + '.' + array[1],
+                        address: array[2],
+                        keys: array
+                }
 
-        default:
-            return {
-                keys: array
-            }
+                default:
+                    return {
+                        keys: array
+                    }
     }
 }
 

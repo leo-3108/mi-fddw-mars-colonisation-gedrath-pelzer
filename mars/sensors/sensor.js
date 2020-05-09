@@ -7,7 +7,7 @@ const logging = require('logging')
 
 exports.start = (getdata, room, type, id, interval = 10) => {
 
-    const output = logging.default(type + '.' + room + '.normal')
+    const output = logging.default(type + '.' + room)
 
     output.info('Started monitoring for ' + room + '.' + id + ' - To exit press CTRL+C')
 
