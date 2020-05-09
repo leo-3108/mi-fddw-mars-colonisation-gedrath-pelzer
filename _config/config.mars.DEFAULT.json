@@ -2,11 +2,12 @@
     "amqp": {
         "url": "amqp://USER:PWD@HOSTADRESS/USER",
         "exch": {
-            "sensor": "sensor",
-            "aggregator": "aggregator",
+            "sensor": "sensoren",
             "enduser": "enduser",
             "subs": "subscription",
-            "comm": "communication"
+            "comm": "communication",
+            "sensor_aggr": "aggregator",
+            "api_aggr": "aggregator"
         }
     },
     "sensors": {
