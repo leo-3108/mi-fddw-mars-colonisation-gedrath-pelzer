@@ -1,3 +1,5 @@
+![Header Image](https://user-images.githubusercontent.com/19761338/81300952-b24baa80-9078-11ea-82b6-2d58b0632362.png)
+
 # Mars Colonisation
 
 Projekt im Rahmen von
