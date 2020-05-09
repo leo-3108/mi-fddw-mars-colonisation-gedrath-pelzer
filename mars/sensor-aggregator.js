@@ -16,7 +16,7 @@ amqp.connect(config.amqp.url, function (error0, connection) {
         }
 
         //Daten empfangen
-        var aggregator_exch = config.amqp.exch.aggregator;
+        var aggregator_exch = config.amqp.exch.sensor_aggr
         channel.assertExchange(aggregator_exch, 'topic', {
             durable: false
         });

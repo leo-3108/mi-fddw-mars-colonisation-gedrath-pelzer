@@ -63,22 +63,33 @@ earth.then(connection => {
                         durable: false
                     })
 
+                    const mars_api_aggr_exch = await channel.assertExchange(config_mars.amqp.exch.api_aggr, 'topic', {
+                        durable: false
+                    })
+
                     let routingKey = earth_comm_topics(message.fields.routingKey)
                     let new_routingKey = message.fields.routingKey
 
                     // Change Routing Key akkording to type
                     if (message.fields.exchange == earth_comm_exch.exchange){
                         new_routingKey = `earth.message.${routingKey.address}`
+
+                        if (mars_channel.publish(mars_enduser_exch.exchange, new_routingKey, message.content))
+                            output.info("✅ Sent data to Mars 👽 from " + message.fields.exchange)
+                        else
+                            output.error("Error accourd while sending data to Brocker")
                     }
                     else if (message.fields.exchange == earth_api_exch.exchange) {
                         new_routingKey = `sensor.${routingKey.address}.normal`
+
+                        // send message
+                        if (mars_channel.publish(mars_api_aggr_exch.exchange, new_routingKey, message.content))
+                            output.info("✅ Sent data to Mars 👽 from " + message.fields.exchange)
+                        else
+                            output.error("Error accourd while sending data to Brocker")
                     }
 
-                    // send message
-                    if (mars_channel.publish(mars_enduser_exch.exchange, new_routingKey, message.content))
-                        output.info("✅ Sent data to Mars 👽 from " + message.fields.exchange)
-                    else
-                        output.error("Error accourd while sending data to Brocker")
+                    
 
 
                 }).catch(err => {
