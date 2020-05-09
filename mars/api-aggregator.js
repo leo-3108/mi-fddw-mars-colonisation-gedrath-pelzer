@@ -8,7 +8,7 @@
  */
 
 // config
-const config = require('../../_config/config.mars.json')
+const config = require('../_config/config.mars.json')
 
 // packages
 const amqp = require('amqplib')
@@ -49,11 +49,13 @@ open.then(connection => {
             if (!message.content)
                 return
 
+            output.info("Received message from Earth")
             let payload = JSON.parse(message.content.toString())
 
-            channel.publish(enduser_exch.exchange, message.fields.routingKey, Buffer.from(
+            if(channel.publish(enduser_exch.exchange, message.fields.routingKey, Buffer.from(
                 JSON.stringify(NASA_Insight(payload))
-            ))
+            )))
+                output.info("Send as topic mars to enduser")
 
         }, {
             // automatic acknowledgment mode,
@@ -75,26 +77,26 @@ open.then(connection => {
  * Converts the NASA API into readable Text for the User
  * TRICK: The Data is seen as Weather-Forecast not as the current weather
  * 
- * @param {Object} paylpoad JSON-Object that comes from Earth
+ * @param {Object} payload JSON-Object that comes from Earth
  */
-const NASA_Insight = (paylpoad) => {
+const NASA_Insight = (payload) => {
     let output = {
         title: "Weather-Report",
         data: []
     }
 
-    let sol_days = paylpad.sol_keys
+    let sol_days = payload.sol_keys
 
     // get the first three dates
     for (let i = 0; i < 3; i++) {
         output.data[i] = {
             date: sol_days[i],
-            dateUTC: paylpoad[sol_days[i]].First_UTC,
-            season: paylpoad[sol_days[i]].Season,
-            temp_high: paylpoad[sol_days[i]].AT.mx,
-            temp_low: paylpoad[sol_days[i]].AT.mn,
-            wind: paylpoad[sol_days[i]].HWS.av,
-            pressure: paylpoad[sol_days[i]].PRE.av,
+            dateUTC: payload[sol_days[i]].First_UTC,
+            season: payload[sol_days[i]].Season,
+            temp_high: payload[sol_days[i]].AT.mx,
+            temp_low: payload[sol_days[i]].AT.mn,
+            wind: payload[sol_days[i]].HWS.av,
+            pressure: payload[sol_days[i]].PRE.av,
         }
         
     }
