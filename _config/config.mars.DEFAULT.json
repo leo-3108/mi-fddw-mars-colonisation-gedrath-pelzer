@@ -7,7 +7,7 @@
             "subs": "subscription",
             "comm": "communication",
             "sensor_aggr": "aggregator",
-            "api_aggr": "aggregator"
+            "api_aggr": "mars-weather"
         }
     },
     "sensors": {
